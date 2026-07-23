@@ -1,8 +1,6 @@
-/*
- * Invisibles — detect and strip hidden / invisible / dangerous Unicode characters.
- * Pure, dependency-free, works in the browser (window.Invisibles) and Node (require).
- * Nothing here touches the network. It never throws on bad input.
- */
+// Invisibles: find and remove hidden Unicode characters (zero-width, fake spaces,
+// bidi controls, tag chars, variation selectors). Works in the browser
+// (window.Invisibles) and in Node via require. No dependencies.
 ;(function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.Invisibles = factory();
