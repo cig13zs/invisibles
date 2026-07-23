@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invisibles — reveal &amp; remove hidden characters from text</title>
+<meta name="description" content="Paste any text and instantly see the invisible characters hiding in it — zero-width spaces, look-alike spaces, bidi controls, AI watermark characters — then strip them with one click. 100% in your browser. Nothing is uploaded. Free and open source.">
+<meta property="og:title" content="Invisibles — reveal &amp; remove hidden characters">
+<meta property="og:description" content="See the invisible Unicode hiding in your text, then strip it. Runs entirely in your browser — nothing uploaded.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='25' font-size='24'>👁️</text></svg>">
+<style>
+  :root{--bg:#fbfbfc;--panel:#fff;--ink:#17171c;--muted:#5c5c6a;--line:#e7e7ec;--accent:#6d5efc;--accent-soft:#eeecff;--hit:#e8465f;--hit-soft:#fdecef;--code:#f3f3f6;--shadow:0 1px 3px rgba(0,0,0,.06),0 14px 36px -14px rgba(20,10,80,.18)}
+  @media (prefers-color-scheme:dark){:root{--bg:#0c0c10;--panel:#15151b;--ink:#f0f0f4;--muted:#9d9dac;--line:#26262f;--accent:#9d92ff;--accent-soft:#1a173a;--hit:#ff6b81;--hit-soft:#33121a;--code:#1a1a22;--shadow:0 1px 3px rgba(0,0,0,.5),0 18px 44px -16px rgba(0,0,0,.75)}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px}
+  a{color:var(--accent)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;background:var(--code);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+  header{padding:72px 0 8px;text-align:center}
+  .eyebrow{display:inline-block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:999px;font-weight:600}
+  h1{font-size:clamp(34px,6vw,54px);line-height:1.05;letter-spacing:-.03em;margin:20px 0 0;font-weight:750}
+  .tagline{font-size:clamp(17px,2.3vw,20px);color:var(--muted);margin:16px auto 0;max-width:34em}
+  .tagline strong{color:var(--ink)}
+
+  .tool{margin:40px auto 0;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px}
+  .ta{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink);padding:14px;font:15px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .ta:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;border-radius:10px;font-weight:650;font-size:14.5px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .opt{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--muted);cursor:pointer;user-select:none}
+  .summary{margin-top:16px;font-size:14.5px}
+  .verdict{font-weight:700}
+  .verdict.clean{color:#12a150}
+  .verdict.dirty{color:var(--hit)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 11px;background:var(--bg);color:var(--muted)}
+  .chip b{color:var(--ink)}
+  .reveal{margin-top:16px;padding:14px;border:1px dashed var(--line);border-radius:11px;background:var(--bg);font:14.5px/1.9 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto}
+  .reveal:empty{display:none}
+  .hit{display:inline-block;min-width:1.1em;text-align:center;background:var(--hit-soft);color:var(--hit);border:1px solid var(--hit);border-radius:4px;padding:0 3px;margin:0 1px;font-size:11px;font-weight:700;vertical-align:middle;cursor:help}
+  .hint{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .out{margin-top:14px}
+  .out .ta{background:var(--code)}
+
+  section{padding:44px 0;border-top:1px solid var(--line);margin-top:56px}
+  section.first{margin-top:64px}
+  h2{font-size:22px;letter-spacing:-.015em;margin:0 0 12px;font-weight:700}
+  p{margin:0 0 14px}
+  .muted{color:var(--muted)}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin-top:20px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card h3{margin:0 0 6px;font-size:14.5px;font-weight:650}
+  .card p{margin:0;font-size:14px;color:var(--muted);line-height:1.55}
+  footer{padding:44px 0 72px;text-align:center;color:var(--muted);font-size:14px}
+  .footkofi{display:inline-block;margin:0 0 18px;padding:12px 22px;border-radius:10px;background:#FF5E5B;color:#fff;font-weight:650;font-size:15px;text-decoration:none;box-shadow:0 4px 16px rgba(255,94,91,.35)}
+  .ghlink{display:inline-block;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">Free &amp; open source · nothing leaves your browser</span>
+  <h1>Invisibles</h1>
+  <p class="tagline">Text can carry characters you can't see — <strong>zero-width spaces, look-alike
+  spaces, direction-flipping controls, AI watermark characters</strong>. Paste it below to reveal
+  them, then strip them with one click.</p>
+</header>
+
+<div class="tool">
+  <textarea id="in" class="ta" placeholder="Paste your text here…" spellcheck="false" autocomplete="off"></textarea>
+  <div class="row">
+    <button id="clean" class="btn primary" disabled>Clean it</button>
+    <label class="opt"><input type="checkbox" id="norm"> also normalize smart quotes / em-dashes to plain ASCII</label>
+  </div>
+
+  <div class="summary" id="summary"></div>
+  <div class="chips" id="chips"></div>
+  <div class="reveal" id="reveal"></div>
+
+  <div class="out" id="outbox" hidden>
+    <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
+    <div class="row">
+      <button id="copy" class="btn primary">Copy clean text</button>
+      <span class="hint" id="delta"></span>
+    </div>
+  </div>
+  <p class="hint">Everything here runs in your browser with JavaScript. This page makes no network
+  requests — open your dev tools and watch. Your text is never sent anywhere.</p>
+</div>
+
+<section class="first">
+  <h2>Why it matters</h2>
+  <p class="muted">A single invisible character can quietly break things. It kept a PlayStation
+  trophy unobtainable for ten years. It corrupts JSON and CSV imports, breaks password fields and
+  code search, and slips fake data into analytics. Direction-control characters can even reorder
+  source code so it does something different from what you read — the "Trojan Source" attack. And
+  text pasted out of an AI often carries tell-tale characters like the narrow no-break space
+  (<code>U+202F</code>) that most editors never show you.</p>
+</section>
+
+<section>
+  <h2>What it catches</h2>
+  <div class="grid">
+    <div class="card"><h3>Zero-width</h3><p>Zero-width spaces, joiners, word joiners, and the BOM — fully invisible, and the ones that break search and passwords.</p></div>
+    <div class="card"><h3>Look-alike spaces</h3><p>NBSP, narrow no-break space, ideographic and thin spaces — they look like a normal space but aren't.</p></div>
+    <div class="card"><h3>Direction controls</h3><p>Right-to-left overrides and isolates that can visually reorder or hide text (Trojan Source).</p></div>
+    <div class="card"><h3>Hidden / tag chars</h3><p>Invisible "tag" characters and variation selectors used to smuggle hidden text, prompts, or watermarks.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Nothing is uploaded</h2>
+  <p class="muted">Most "remove invisible characters" and "AI text cleaner" tools are web services —
+  you paste sensitive text and it goes to their server. This one doesn't have a server. The whole
+  thing is a single page and one small script you can read in a couple of minutes. It works offline,
+  and it stays free.</p>
+  <p><a class="ghlink" href="https://github.com/cig13zs/invisibles">Read the source on GitHub →</a></p>
+</section>
+
+<footer>
+  <a class="footkofi" href="https://ko-fi.com/jju1s" target="_blank" rel="noopener">☕ Support on Ko-fi</a>
+  <p>Free, and it stays free. There's no paid tier. If it saved you a headache, a coffee keeps these
+  tools coming: <a href="https://ko-fi.com/jju1s">ko-fi.com/jju1s</a>.</p>
+  <p class="muted" style="font-size:12.5px;margin-top:18px">MIT licensed. Runs entirely in your browser.</p>
+</footer>
+
+</div>
+
+<script src="core.js"></script>
+<script>
+(function () {
+  var I = window.Invisibles;
+  var inEl = document.getElementById('in'),
+      cleanBtn = document.getElementById('clean'),
+      normEl = document.getElementById('norm'),
+      summary = document.getElementById('summary'),
+      chips = document.getElementById('chips'),
+      reveal = document.getElementById('reveal'),
+      outbox = document.getElementById('outbox'),
+      outEl = document.getElementById('out'),
+      copyBtn = document.getElementById('copy'),
+      delta = document.getElementById('delta');
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // Short label shown inside each highlighted hit.
+  var SHORT = {'zero-width':'ZW','space':'SP','bidi':'BIDI','soft-hyphen':'SHY','tag-char':'TAG','variation-selector':'VS','control':'CTRL'};
+
+  // ponytail: reveal is O(n) DOM build — skip it past 20k chars, the counts still show.
+  var REVEAL_LIMIT = 20000;
+
+  function render() {
+    var text = inEl.value;
+    var r = I.scan(text);
+    // Enabled when there's something to strip, or the punctuation toggle is on (AI-text case:
+    // em dashes / smart quotes but no invisible chars).
+    cleanBtn.disabled = !text || (r.total === 0 && !normEl.checked);
+
+    if (!text) { summary.innerHTML=''; chips.innerHTML=''; reveal.innerHTML=''; outbox.hidden=true; return; }
+
+    if (r.total === 0) {
+      summary.innerHTML = '<span class="verdict clean">Clean.</span> No hidden characters found.'
+        + (normEl.checked ? ' Punctuation will still be normalized.' : '');
+      chips.innerHTML = ''; reveal.innerHTML = '';
+      return;
+    }
+
+    summary.innerHTML = '<span class="verdict dirty">' + r.total + ' hidden character' +
+      (r.total>1?'s':'') + '</span> found.';
+
+    var cats = Object.keys(r.counts).sort();
+    chips.innerHTML = cats.map(function(c){
+      var label = (I.CATEGORIES[c] || c);
+      return '<span class="chip" title="'+esc(label)+'"><b>'+r.counts[c]+'</b> '+esc(label.split(' — ')[0])+'</span>';
+    }).join('');
+
+    if (text.length > REVEAL_LIMIT) {
+      reveal.innerHTML = '<span class="muted">Text too long to highlight inline — counts above are still exact. Clean it to strip them all.</span>';
+      return;
+    }
+
+    // Build the reveal: normal chars escaped, each hidden char boxed with a tooltip.
+    var marks = {}; r.findings.forEach(function(f){ marks[f.index]=f; });
+    var html = '', idx = 0;
+    while (idx < text.length) {
+      var cp = text.codePointAt(idx);
+      var f = marks[idx];
+      if (f) {
+        html += '<span class="hit" title="'+esc(f.name)+' ('+f.hex+')">'+(SHORT[f.category]||'?')+'</span>';
+      } else {
+        html += esc(String.fromCodePoint(cp));
+      }
+      idx += cp > 0xFFFF ? 2 : 1;
+    }
+    reveal.innerHTML = html;
+  }
+
+  function doClean() {
+    var t = I.clean(inEl.value);
+    if (normEl.checked) t = I.normalizePunctuation(t);
+    outEl.value = t;
+    outbox.hidden = false;
+    var before = inEl.value.length, after = t.length;
+    delta.textContent = before !== after
+      ? (before - after) + ' character' + (before-after===1?'':'s') + ' removed.'
+      : 'Punctuation normalized.';
+    outEl.style.height = 'auto';
+    outEl.style.height = Math.min(outEl.scrollHeight + 4, 320) + 'px';
+  }
+
+  copyBtn.addEventListener('click', function () {
+    outEl.select();
+    navigator.clipboard.writeText(outEl.value).then(function(){
+      var old = copyBtn.textContent; copyBtn.textContent = 'Copied ✓';
+      setTimeout(function(){ copyBtn.textContent = old; }, 1400);
+    }).catch(function(){ document.execCommand('copy'); });
+  });
+
+  inEl.addEventListener('input', render);
+  normEl.addEventListener('change', render);
+  cleanBtn.addEventListener('click', doClean);
+  render();
+})();
+</script>
+</body>
+</html>
