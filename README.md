@@ -8,12 +8,18 @@ browser.
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/cig13zs/invisibles/test.yml?style=flat-square&label=tests)](https://github.com/cig13zs/invisibles/actions)
 
-**[cig13zs.github.io/invisibles](https://cig13zs.github.io/invisibles/)**
+**[cig13zs.github.io/invisibles](https://cig13zs.github.io/invisibles/)** · or install it as a
+[browser extension](#browser-extension) so it's one click away from any tab, offline.
 
 Paste any text, see every hidden character highlighted with its name and code point, then click once
 to remove them. A single invisible character kept a PlayStation trophy unobtainable for ten years,
 corrupts CSV/JSON imports, breaks password and code search, and slips into text pasted out of AI
 tools. This finds them.
+
+Comes in two forms, same engine (`core.js`) behind both:
+
+- **Web app** — nothing to install: [cig13zs.github.io/invisibles](https://cig13zs.github.io/invisibles/)
+- **Browser extension** — a popup you can pop from any page, works offline, **zero permissions**
 
 ## Nothing is uploaded
 
@@ -53,12 +59,26 @@ I.normalizePunctuation('“a”—b');  // '"a"--b'  (opt-in)
 
 `scan()` and `clean()` never throw, even on non-string input.
 
+## Browser extension
+
+The extension is popup-only — click the toolbar icon, paste, clean, copy. It declares **no
+`permissions` and no host access at all**; it can't read any page you visit. It's the web app in a
+popup, so it works with no connection.
+
+Not on the Chrome Web Store yet — load it unpacked (Chrome, Edge, Brave, Opera):
+
+1. Download the latest zip from [Releases](https://github.com/cig13zs/invisibles/releases) and unzip it.
+2. Open `chrome://extensions`, turn on **Developer mode**.
+3. **Load unpacked** → pick the `extension` folder.
+4. Click the Invisibles icon, paste your text.
+
 ## How it's built
 
 ```
 core.js        classify() + scan() + clean() + normalizePunctuation() — browser + Node
 core.test.js   node core.test.js
-index.html     the page: paste, reveal, clean, copy — no framework, no build step
+index.html     the web app: paste, reveal, clean, copy — no framework, no build step
+extension/     MV3 popup (popup.html + core.js + icons) — no permissions
 ```
 
 ```bash
