@@ -92,4 +92,13 @@ view shows you exactly what and where before you strip anything. The punctuation
 and lossy, since em dashes become `--`, and it's off by default. It can't tell you whether text was
 written by an AI; it only shows the characters that are actually there.
 
+## More tools
+
+- **[Carryover](https://github.com/cig13zs/carryover)** — AI chat context transfer for ChatGPT, DeepSeek & Grok
+- **[Rinse](https://github.com/cig13zs/rinse)** — see the GPS in a photo, then wash it off
+- **[Return Google Cache](https://github.com/cig13zs/return-google-cache)** — put the Cached link back on Google results
+- **[Return 100 Results](https://github.com/cig13zs/return-100-results)** — browse ~100 Google results as one page
+
+All free, all offline, all open source. [More →](https://github.com/cig13zs/About-Me)
+
 MIT licensed. Do what you like with it.
