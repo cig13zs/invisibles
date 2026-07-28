@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Invisibles — see the hidden characters in your text and remove them</title>
+<title>Invisibles: see the hidden characters in your text and remove them</title>
 <meta name="description" content="Paste text and see the invisible characters hiding in it: zero-width spaces, fake spaces, direction controls, the odd characters that ride along in text copied out of an AI. Then strip them in one click. Runs in your browser, nothing gets uploaded.">
 <meta property="og:title" content="Invisibles">
 <meta property="og:description" content="See the invisible characters hiding in your text, then remove them. Runs in your browser.">
@@ -123,7 +123,7 @@
 
 <footer>
   <p style="margin-bottom:16px"><a class="kofi" href="https://ko-fi.com/jju1s" target="_blank" rel="noopener">Buy me a coffee</a></p>
-  <p>It's free and it stays free. If it saved you a headache, a coffee at
+  <p>If it saved you a headache, there is a tip jar at
   <a href="https://ko-fi.com/jju1s">ko-fi.com/jju1s</a> keeps me making these.</p>
   <p style="font-size:12.5px;margin-top:16px">MIT licensed. Not affiliated with anyone.</p>
 </footer>
@@ -169,7 +169,7 @@
     var cats = Object.keys(r.counts).sort();
     chips.innerHTML = cats.map(function(c){
       var label = (I.CATEGORIES[c] || c);
-      return '<span class="chip" title="'+esc(label)+'"><b>'+r.counts[c]+'</b> '+esc(label.split(' — ')[0])+'</span>';
+      return '<span class="chip" title="'+esc(label)+'"><b>'+r.counts[c]+'</b> '+esc(label.split(': ')[0])+'</span>';
     }).join('');
 
     if (text.length > REVEAL_LIMIT) {

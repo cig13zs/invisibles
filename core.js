@@ -38,15 +38,15 @@
     0xFFFC: 'Object Replacement Character'
   };
 
-  // Category labels shown to the user, with a one-line why-it-matters.
+  // Labels shown in the UI.
   var CATEGORIES = {
-    'zero-width':          'Zero-width — invisible, breaks search/passwords/code',
-    'space':               'Look-alike space — not a normal space (NBSP, NNBSP, …)',
-    'bidi':                'Bidirectional control — can reorder/hide text (Trojan Source)',
-    'soft-hyphen':         'Soft hyphen — invisible unless the line wraps',
-    'tag-char':            'Tag character — invisible, used to smuggle hidden text/prompts',
-    'variation-selector':  'Variation selector — invisible, can carry hidden data',
-    'control':             'Control character — non-printing, often breaks parsers'
+    'zero-width':          'Zero-width: invisible, breaks search/passwords/code',
+    'space':               'Look-alike space: not a real space (NBSP, NNBSP, ...)',
+    'bidi':                'Bidirectional control: can reorder or hide text (Trojan Source)',
+    'soft-hyphen':         'Soft hyphen: invisible unless the line wraps',
+    'tag-char':            'Tag character: invisible, used to smuggle hidden text or prompts',
+    'variation-selector':  'Variation selector: invisible, can carry hidden data',
+    'control':             'Control character: non-printing, often breaks parsers'
   };
 
   // classify(cp) -> {category, action} or null if the character is fine to keep.
@@ -117,8 +117,8 @@
     return out;
   }
 
-  // normalizePunctuation(text) -> opt-in: turn "fancy" typography (the AI tells) into plain ASCII.
-  // Kept separate from clean() because these characters are visible and sometimes wanted.
+  // normalizePunctuation(text) -> opt-in: fancy typography down to plain ASCII.
+  // Separate from clean() because these characters are visible and often wanted.
   function normalizePunctuation(text) {
     if (typeof text !== 'string') return '';
     return text

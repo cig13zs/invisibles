@@ -32,7 +32,7 @@
 </head>
 <body>
   <h1>Invisibles</h1>
-  <p class="sub">Reveal &amp; strip hidden characters. Runs offline — nothing leaves your browser.</p>
+  <p class="sub">Reveal &amp; strip hidden characters. Runs offline, nothing leaves your browser.</p>
   <textarea id="in" placeholder="Paste text here…" spellcheck="false" autocomplete="off"></textarea>
   <div class="row">
     <button id="clean" class="primary" disabled>Clean it</button>
@@ -68,7 +68,7 @@
     summary.innerHTML='<span class="verdict dirty">'+r.total+' hidden character'+(r.total>1?'s':'')+'</span> found.';
     var cats=Object.keys(r.counts).sort();
     chips.innerHTML=cats.map(function(c){
-      var label=(I.CATEGORIES[c]||c).split(' — ')[0];
+      var label=(I.CATEGORIES[c]||c).split(': ')[0];
       return '<span class="chip"><b>'+r.counts[c]+'</b> '+label+'</span>';
     }).join('');
   }

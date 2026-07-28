@@ -1,4 +1,4 @@
-// node core.test.js  — no framework, asserts the parser reads and cleans a real nasty string.
+// node core.test.js
 var assert = require('assert');
 var I = require('./core.js');
 
@@ -21,16 +21,29 @@ var cleaned = I.clean(sample);
 assert.strictEqual(cleaned, 'hello worldx', 'strips invisibles, NBSP becomes a real space');
 assert.strictEqual(I.scan(cleaned).total, 0, 'cleaned text has nothing left to flag');
 
-// Visible typography (em dash, smart quotes) is NOT invisible — must not be flagged or stripped.
+// Visible typography (em dash, smart quotes) must not be flagged or stripped.
 var visible = 'Normal text.\nTab\there. Em—dash and “quotes”.';
 assert.strictEqual(I.scan(visible).total, 0, 'em dash / smart quotes are not hidden characters');
 assert.strictEqual(I.clean(visible), visible, 'clean leaves visible text exactly alone');
 
-// Opt-in punctuation normalize turns the AI "tells" into plain ASCII.
+// Opt-in punctuation normalize drops it to plain ASCII.
 assert.strictEqual(I.normalizePunctuation('“a”—b…'), '"a"--b...');
 
 // Never throws on non-strings.
 assert.strictEqual(I.scan(null).total, 0);
 assert.strictEqual(I.clean(undefined), '');
 
-console.log('ok — all assertions passed');
+// The extension ships its own copy of core.js. They drifted once already.
+const fs = require('fs');
+const path = require('path');
+assert.strictEqual(
+  fs.readFileSync(path.join(__dirname, 'core.js'), 'utf8'),
+  fs.readFileSync(path.join(__dirname, 'extension', 'core.js'), 'utf8'),
+  'extension/core.js is out of sync with core.js');
+
+// The UI splits category labels on ": " to get the short name.
+Object.values(I.CATEGORIES).forEach(function (label) {
+  assert.ok(label.indexOf(': ') > 0, 'category label has no ": " separator: ' + label);
+});
+
+console.log('ok, all assertions passed');
