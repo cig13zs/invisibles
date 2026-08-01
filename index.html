@@ -8,6 +8,9 @@
 <meta property="og:title" content="Invisibles">
 <meta property="og:description" content="See the invisible characters hiding in your text, then remove them. Runs in your browser.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://cig13zs.github.io/invisibles/">
+<meta name="theme-color" content="#161613">
+<link rel="canonical" href="https://cig13zs.github.io/invisibles/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='25' font-size='24'>👁️</text></svg>">
 <style>
   :root{--bg:#fcfcfb;--panel:#fff;--ink:#161613;--muted:#5f5f58;--line:#e6e6e1;--accent:#161613;--hit:#c62f42;--hit-soft:#fbe9ec;--ok:#127a3e;--code:#f2f2ee}
@@ -16,6 +19,12 @@
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:680px;margin:0 auto;padding:0 24px}
   a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+  a:focus-visible,.btn:focus-visible,input:focus-visible{outline:3px solid var(--hit);outline-offset:3px}
+  .skip-link{position:fixed;left:16px;top:12px;z-index:10;padding:8px 12px;border-radius:8px;
+    background:var(--ink);color:var(--bg);text-decoration:none;transform:translateY(-160%)}
+  .skip-link:focus{transform:translateY(0)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0}
   code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;background:var(--code);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
   header{padding:70px 0 4px}
   h1{font-size:clamp(34px,6vw,50px);line-height:1.04;letter-spacing:-.03em;margin:0;font-weight:740}
@@ -52,9 +61,11 @@
   dd{margin:3px 0 0;color:var(--muted);font-size:14px}
   footer{padding:40px 0 72px;margin-top:44px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
   .kofi{display:inline-block;padding:11px 20px;border-radius:9px;background:#FF5E5B;color:#fff;font-weight:640;font-size:14.5px;text-decoration:none}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="wrap">
 
 <header>
@@ -63,22 +74,25 @@
   what's hiding, then strips it. It runs in your browser, so nothing gets sent anywhere.</p>
 </header>
 
+<main id="main">
 <div class="tool">
+  <label class="sr-only" for="in">Text to inspect</label>
   <textarea id="in" class="ta" placeholder="Paste your text here…" spellcheck="false" autocomplete="off"></textarea>
   <div class="row">
-    <button id="clean" class="btn primary" disabled>Clean it</button>
+    <button id="clean" class="btn primary" type="button" disabled>Clean it</button>
     <label class="opt"><input type="checkbox" id="norm"> also turn smart quotes and em dashes into plain ASCII</label>
   </div>
 
-  <div class="summary" id="summary"></div>
+  <div class="summary" id="summary" role="status" aria-live="polite"></div>
   <div class="chips" id="chips"></div>
   <div class="reveal" id="reveal"></div>
 
   <div class="out" id="outbox" hidden>
+    <label class="sr-only" for="out">Clean text</label>
     <textarea id="out" class="ta" readonly spellcheck="false"></textarea>
     <div class="row">
-      <button id="copy" class="btn primary">Copy clean text</button>
-      <span class="hint" id="delta"></span>
+      <button id="copy" class="btn primary" type="button">Copy clean text</button>
+      <span class="hint" id="delta" aria-live="polite"></span>
     </div>
   </div>
   <p class="hint">All of this happens in the page with JavaScript. It makes no network requests.
@@ -120,11 +134,12 @@
   <p><a href="https://github.com/cig13zs/invisibles">Source on GitHub</a> if you'd rather run it yourself,
   or grab the <a href="https://github.com/cig13zs/invisibles/releases">browser extension</a> so it's a click away from any tab.</p>
 </section>
+</main>
 
 <footer>
   <p style="margin-bottom:16px"><a class="kofi" href="https://ko-fi.com/jju1s" target="_blank" rel="noopener">Buy me a coffee</a></p>
-  <p>If it saved you a headache, there is a tip jar at
-  <a href="https://ko-fi.com/jju1s">ko-fi.com/jju1s</a> keeps me making these.</p>
+  <p>If it saved you a headache, <a href="https://ko-fi.com/jju1s">ko-fi.com/jju1s</a>
+  keeps me making these.</p>
   <p style="font-size:12.5px;margin-top:16px">MIT licensed. Not affiliated with anyone.</p>
 </footer>
 

@@ -11,6 +11,8 @@
   .sub{color:var(--muted);font-size:11.5px;margin:0 0 10px}
   textarea{width:100%;min-height:84px;resize:vertical;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink);padding:10px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
   textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--hit);outline-offset:2px}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}
   button{padding:8px 14px;border-radius:8px;font-weight:650;font-size:12.5px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
   button.primary{background:var(--accent);color:var(--on);border-color:var(--accent)}
@@ -33,16 +35,18 @@
 <body>
   <h1>Invisibles</h1>
   <p class="sub">Reveal &amp; strip hidden characters. Runs offline, nothing leaves your browser.</p>
+  <label class="sr-only" for="in">Text to inspect</label>
   <textarea id="in" placeholder="Paste text here…" spellcheck="false" autocomplete="off"></textarea>
   <div class="row">
-    <button id="clean" class="primary" disabled>Clean it</button>
-    <button id="copy" hidden>Copy clean text</button>
+    <button id="clean" class="primary" type="button" disabled>Clean it</button>
+    <button id="copy" type="button" hidden>Copy clean text</button>
   </div>
   <label class="opt"><input type="checkbox" id="norm"> normalize smart quotes / em-dashes to ASCII</label>
-  <div id="summary"></div>
+  <div id="summary" role="status" aria-live="polite"></div>
   <div id="chips"></div>
+  <label class="sr-only" for="out">Clean text</label>
   <textarea id="out" readonly spellcheck="false" hidden></textarea>
-  <div class="hint" id="delta"></div>
+  <div class="hint" id="delta" aria-live="polite"></div>
   <div class="links">
     <a class="kofi" href="https://ko-fi.com/jju1s" target="_blank" rel="noopener">☕ Ko-fi</a>
     <a class="gh" href="https://github.com/cig13zs/invisibles" target="_blank" rel="noopener">GitHub</a>
