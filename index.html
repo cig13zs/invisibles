@@ -13,13 +13,14 @@
 <link rel="canonical" href="https://cig13zs.github.io/invisibles/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='25' font-size='24'>👁️</text></svg>">
 <style>
-  :root{--bg:#fcfcfb;--panel:#fff;--ink:#161613;--muted:#5f5f58;--line:#e6e6e1;--accent:#161613;--hit:#c62f42;--hit-soft:#fbe9ec;--ok:#127a3e;--code:#f2f2ee}
-  @media (prefers-color-scheme:dark){:root{--bg:#0e0e0d;--panel:#161615;--ink:#efefe9;--muted:#9c9c92;--line:#282824;--accent:#efefe9;--hit:#ff6b7c;--hit-soft:#331319;--ok:#4ec27e;--code:#1a1a18}}
+  /* shared token set, same in the popup and in every tool in the line */
+  :root{--bg:#faf9f6;--panel:#fff;--ink:#1c1a17;--muted:#6b665d;--line:#e4e0d8;--accent:#b4522f;--clay:#b4522f;--hit:#b3372c;--hit-soft:#f9eae8;--ok:#1f7a4d;--code:#f3f1ec}
+  @media (prefers-color-scheme:dark){:root{--bg:#14130f;--panel:#1c1a16;--ink:#f0ede5;--muted:#a09a8d;--line:#2e2a24;--accent:#e0865e;--clay:#e0865e;--hit:#ef7f70;--hit-soft:#2c1815;--ok:#54c489;--code:#221f1a}}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:680px;margin:0 auto;padding:0 24px}
   a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
-  a:focus-visible,.btn:focus-visible,input:focus-visible{outline:3px solid var(--hit);outline-offset:3px}
+  a:focus-visible,.btn:focus-visible,input:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
   .skip-link{position:fixed;left:16px;top:12px;z-index:10;padding:8px 12px;border-radius:8px;
     background:var(--ink);color:var(--bg);text-decoration:none;transform:translateY(-160%)}
   .skip-link:focus{transform:translateY(0)}
