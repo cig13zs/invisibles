@@ -2,34 +2,79 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invisibles</title>
 <style>
-  :root{--bg:#fcfcfb;--panel:#fff;--ink:#161613;--muted:#5f5f58;--line:#e6e6e1;--accent:#161613;--hit:#c62f42;--hit-soft:#fbe9ec;--code:#f2f2ee;--on:#fcfcfb}
-  @media (prefers-color-scheme:dark){:root{--bg:#0e0e0d;--panel:#161615;--ink:#efefe9;--muted:#9c9c92;--line:#282824;--accent:#efefe9;--hit:#ff6b7c;--hit-soft:#331319;--code:#1a1a18;--on:#0e0e0d}}
+  /* ---- shared token set, same in every tool in the line ---------------- */
+  :root{
+    --bg:#faf9f6;      --panel:#fff;      --raised:#f3f1ec;
+    --ink:#1c1a17;     --muted:#6b665d;   --line:#e4e0d8;
+    --clay:#b4522f;    --clay-soft:#f7ece7;  --clay-ink:#fdfcfa;
+    --ok:#1f7a4d;      --hit:#b3372c;     --hit-soft:#f9eae8;
+    --r-sm:8px; --r-md:11px; --r-lg:14px; --r-pill:999px;
+    --s1:6px; --s2:10px; --s3:14px; --s4:20px; --s5:28px;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#14130f;      --panel:#1c1a16;   --raised:#221f1a;
+    --ink:#f0ede5;     --muted:#a09a8d;   --line:#2e2a24;
+    --clay:#e0865e;    --clay-soft:#2a1c15;  --clay-ink:#14130f;
+    --ok:#54c489;      --hit:#ef7f70;     --hit-soft:#2c1815;
+  }}
   *{box-sizing:border-box}
-  body{width:340px;margin:0;padding:14px;background:var(--bg);color:var(--ink);font:13.5px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-  h1{font-size:14px;margin:0 0 2px;font-weight:700}
-  .sub{color:var(--muted);font-size:11.5px;margin:0 0 10px}
-  textarea{width:100%;min-height:84px;resize:vertical;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink);padding:10px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-  textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
-  a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--hit);outline-offset:2px}
+  /* 360 drives the extension popup. max-width lets it shrink on a phone,
+     auto margins centre it when someone opens the file as a page. */
+  body{width:360px;max-width:100%;margin:0 auto;padding:var(--s3);
+    background:var(--bg);color:var(--ink);
+    font:14px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+  @media (min-width:560px){body{width:440px;padding:var(--s4);font-size:15px}}
+
+  h1{font-size:17px;margin:0;font-weight:660;letter-spacing:-.01em}
+  h1 .dot{color:var(--clay)}
+  .sub{color:var(--muted);font-size:12.5px;margin:3px 0 var(--s3);max-width:34em}
+
+  textarea{width:100%;min-height:96px;resize:vertical;border:1px solid var(--line);
+    border-radius:var(--r-md);background:var(--panel);color:var(--ink);padding:11px 12px;
+    font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  textarea::placeholder{color:var(--muted);opacity:.75}
+  textarea:focus{outline:2px solid var(--clay);outline-offset:1px;border-color:var(--clay)}
+  a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:9px}
-  button{padding:8px 14px;border-radius:8px;font-weight:650;font-size:12.5px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
-  button.primary{background:var(--accent);color:var(--on);border-color:var(--accent)}
-  button:disabled{opacity:.5;cursor:default}
-  label.opt{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);cursor:pointer;margin-top:8px}
-  #summary{margin-top:10px;font-size:12.5px}
-  .verdict{font-weight:700}
-  .verdict.clean{color:#12a150}.verdict.dirty{color:var(--hit)}
-  #chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
-  .chip{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:3px 8px;color:var(--muted)}
-  .chip b{color:var(--ink)}
-  #out{margin-top:9px;background:var(--code)}
-  .hint{font-size:11px;color:var(--muted);margin-top:8px}
-  .links{display:flex;gap:8px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
-  .links a{flex:1;text-align:center;text-decoration:none;font-weight:600;font-size:11.5px;padding:7px;border-radius:7px}
-  .kofi{background:#FF5E5B;color:#fff}
-  .gh{background:var(--code);color:var(--ink)}
+
+  .row{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;margin-top:var(--s2)}
+  button{min-height:38px;padding:9px 16px;border-radius:var(--r-sm);font-weight:620;font-size:13px;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;
+    transition:background .15s ease,border-color .15s ease}
+  button:hover{border-color:var(--muted)}
+  button.primary{background:var(--clay);color:var(--clay-ink);border-color:var(--clay)}
+  button.primary:hover{background:var(--ink);border-color:var(--ink)}
+  button:disabled{opacity:.42;cursor:default}
+  button:disabled:hover{border-color:var(--line);background:var(--panel)}
+  /* a finger needs more than a mouse does */
+  @media (pointer:coarse){button{min-height:44px}label.opt{min-height:32px}}
+
+  label.opt{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);
+    cursor:pointer;margin-top:var(--s2)}
+  label.opt input{accent-color:var(--clay);width:15px;height:15px;flex:none}
+
+  #summary{margin-top:var(--s3);font-size:13px}
+  .verdict{font-weight:680}
+  .verdict.clean{color:var(--ok)}.verdict.dirty{color:var(--clay)}
+  #chips{display:flex;gap:var(--s1);flex-wrap:wrap;margin-top:var(--s1)}
+  .chip{font-size:11.5px;border:1px solid var(--line);border-radius:var(--r-pill);
+    padding:3px 10px;color:var(--muted);background:var(--panel)}
+  .chip b{color:var(--ink);font-weight:640}
+  #out{margin-top:var(--s2);background:var(--raised)}
+  .hint{font-size:12px;color:var(--muted);margin-top:var(--s2)}
+
+  .links{display:flex;gap:var(--s2);margin-top:var(--s4);border-top:1px solid var(--line);padding-top:var(--s3)}
+  .links a{flex:1;text-align:center;text-decoration:none;font-weight:620;font-size:12.5px;
+    padding:9px;border-radius:var(--r-sm);min-height:38px;display:flex;align-items:center;justify-content:center}
+  .kofi{background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay)}
+  .kofi:hover{background:var(--clay);color:var(--clay-ink)}
+  .gh{background:var(--raised);color:var(--ink);border:1px solid var(--line)}
+  .gh:hover{border-color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
@@ -77,11 +122,17 @@
     }).join('');
   }
   function doClean(){
-    var t=I.clean(inEl.value);
+    var before=inEl.value, t=I.clean(before);
     if(norm.checked) t=I.normalizePunctuation(t);
     out.value=t; out.hidden=false; copyBtn.hidden=false;
-    var d=inEl.value.length-t.length;
-    delta.textContent=d>0?(d+' character'+(d===1?'':'s')+' removed.'):'Punctuation normalized.';
+    // A look-alike space becomes a real space, so it never shows up in a length
+    // difference. Reporting only that difference read as "found 4, removed 2",
+    // which looks like it missed two.
+    var r=I.scan(before), swapped=r.counts.space||0, deleted=r.total-swapped, parts=[];
+    if(deleted) parts.push(deleted+' removed');
+    if(swapped) parts.push(swapped+' turned into a normal space');
+    if(!parts.length) delta.textContent=norm.checked?'Punctuation normalized.':'Nothing to change.';
+    else delta.textContent=parts.join(', ')+'.'+(norm.checked?' Punctuation normalized.':'');
   }
   copyBtn.addEventListener('click',function(){
     navigator.clipboard.writeText(out.value).then(function(){
