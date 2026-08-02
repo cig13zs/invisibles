@@ -1,0 +1,7 @@
+# Style checks off for the files that have to contain the characters this tool
+# removes. The replacement table, its fixtures and the README examples are data.
+# Secret and leakage checks still run on every file.
+core.js
+extension/core.js
+core.test.js
+README.md
