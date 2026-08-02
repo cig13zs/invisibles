@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invisibles privacy policy</title>
+<meta name="description" content="Invisibles collects no data of any kind. It makes no network requests, stores nothing, and declares no permissions.">
+<meta name="theme-color" content="#161613">
+<link rel="canonical" href="https://cig13zs.github.io/invisibles/privacy.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='25' font-size='24'>&#128065;</text></svg>">
+<style>
+  :root{--bg:#fcfcfb;--panel:#fff;--ink:#161613;--muted:#5f5f58;--line:#e6e6e1;--accent:#161613;--code:#f2f2ee}
+  @media (prefers-color-scheme:dark){:root{--bg:#0e0e0d;--panel:#161615;--ink:#efefe9;--muted:#9c9c92;--line:#282824;--accent:#efefe9;--code:#1a1a18}}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto;padding:70px 24px 80px}
+  a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+  a:focus-visible{outline:3px solid #c62f42;outline-offset:3px}
+  h1{font-size:clamp(30px,5vw,42px);line-height:1.05;letter-spacing:-.03em;margin:0;font-weight:740}
+  .sub{color:var(--muted);margin:12px 0 34px;font-size:15px}
+  h2{font-size:19px;letter-spacing:-.01em;margin:34px 0 10px;font-weight:680}
+  p{margin:0 0 14px}
+  ul{margin:0 0 14px;padding-left:20px;color:var(--muted)}
+  li{margin:0 0 6px}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em;background:var(--code);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+  .back{display:inline-block;margin-top:38px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;width:100%}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Privacy policy</h1>
+<p class="sub">Invisibles browser extension and web app &middot; last updated 3 August 2026</p>
+
+<h2>The short version</h2>
+<p>Invisibles collects nothing, stores nothing and transmits nothing. There is no server, no
+account, no analytics and no storage of any kind. The text you paste exists in the page while you
+are looking at it and is gone when you close it.</p>
+
+<h2>What data is collected</h2>
+<p>None. Nothing is gathered, retained, transmitted or sold. Invisibles never collects, transmits
+or sells:</p>
+<ul>
+  <li>personally identifiable information</li>
+  <li>health, financial or authentication information</li>
+  <li>personal communications, including the text you paste in</li>
+  <li>location, browsing history or web activity</li>
+  <li>usage analytics, crash reports or telemetry</li>
+</ul>
+
+<h2>How it works instead</h2>
+<p>You paste text into a box. The script scans that string for characters in its table, marks where
+they sit, and builds a cleaned copy. All of it happens in the page you have open, in your own
+browser, using ordinary JavaScript on a variable in memory. Nothing is written anywhere and nothing
+is sent anywhere.</p>
+<p>Closing the tab is the whole of the deletion process, because there is nothing to delete.</p>
+
+<h2>Storage</h2>
+<p>None. Invisibles uses no <code>localStorage</code>, no <code>sessionStorage</code>, no
+<code>chrome.storage</code>, no cookies and no IndexedDB. This is checkable: the source is public
+and those APIs appear nowhere in it.</p>
+
+<h2>Permissions</h2>
+<p>The extension declares no <code>permissions</code> and no <code>host_permissions</code> in its
+manifest. It cannot read the pages you visit, it has no access to your tabs, your history or your
+files, and it cannot act outside its own popup. Read <code>manifest.json</code> in the extension
+folder and you will find no permissions key at all.</p>
+
+<h2>Network access</h2>
+<p>Invisibles makes no network requests. It contains no remote code, no third-party libraries, no
+fonts loaded from elsewhere and no tracking scripts. Because it never opens a connection, it cannot
+transmit your text even in principle. Open your browser's network tab and watch it stay empty while
+you use it.</p>
+<p>The same is true of the web app at
+<a href="https://cig13zs.github.io/invisibles/">cig13zs.github.io/invisibles</a>, which is one HTML
+file and one script. GitHub serves that page and will see the request for it in the way any web
+server sees a request, which is covered by
+<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's
+privacy statement</a>. Nothing you paste into the page is part of that.</p>
+
+<h2>Third parties</h2>
+<p>No data is shared with third parties, because none is collected. Invisibles is not affiliated
+with, endorsed by or connected to OpenAI or any other AI provider.</p>
+
+<h2>What it does not claim</h2>
+<p>Invisibles removes invisible characters. That is not the same as removing an AI watermark: the
+statistical patterns in word choice and sentence structure are a separate thing, and no character
+cleaner touches them. If a tool tells you otherwise, it is overselling.</p>
+
+<h2>Changes</h2>
+<p>If this policy changes, the updated version appears at this address and the date above changes.
+The source is public, so any change in behaviour is visible in the commit history.</p>
+
+<h2>Contact</h2>
+<p>Questions or reports:
+<a href="https://github.com/cig13zs/invisibles/issues">open an issue on GitHub</a>.</p>
+
+<a class="back" href="./">&larr; Back to Invisibles</a>
+
+</div>
+</body>
+</html>
