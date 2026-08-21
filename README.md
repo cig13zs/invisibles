@@ -44,17 +44,14 @@ typographic giveaways out of AI text.
 
 ## Browser extension
 
-Popup only. Click the toolbar icon, paste, clean, copy. It declares no
-permissions and no host access, so it can't read any page you visit, and it
-works with no connection.
+Opens directly as a Chrome Side Panel. Click the toolbar icon, and it docks cleanly on the side of your browser without floating in front of your page content. Paste, clean, copy. It declares no remote permissions and no host access, so it can't read any page you visit, and it works completely offline.
 
-Not on the Chrome Web Store yet, so load it unpacked in Chrome, Edge, Brave or
-Opera:
+Load it unpacked in Chrome, Edge, Brave or Opera:
 
 1. Download the latest zip from [Releases](https://github.com/cig13zs/invisibles/releases) and unzip it.
 2. Open `chrome://extensions` and turn on Developer mode.
 3. Click Load unpacked and pick the `extension` folder.
-4. Click the Invisibles icon and paste your text.
+4. Click the Invisibles icon to open the sidebar and paste your text.
 
 ## Use it as a library
 

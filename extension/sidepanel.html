@@ -1,0 +1,113 @@
+﻿<!doctype html>
+<html lang=" en\>
+<head>
+<meta charset=\utf-8\>
+<meta name=\viewport\ content=\width=device-width,initial-scale=1\>
+<title>Invisibles Sidebar</title>
+<style>
+ :root{
+ --bg:#faf9f6; --panel:#fff; --raised:#f3f1ec;
+ --ink:#1c1a17; --muted:#6b665d; --line:#e4e0d8;
+ --clay:#b4522f; --clay-soft:#f7ece7; --clay-ink:#fdfcfa;
+ --ok:#1f7a4d; --hit:#b3372c; --hit-soft:#f9eae8;
+ --r-sm:8px; --r-md:11px; --r-lg:14px; --r-pill:999px;
+ --s1:6px; --s2:10px; --s3:14px; --s4:20px; --s5:28px;
+ }
+ @media (prefers-color-scheme:dark){:root{
+ --bg:#14130f; --panel:#1c1a16; --raised:#221f1a;
+ --ink:#f0ede5; --muted:#a09a8d; --line:#2e2a24;
+ --clay:#e0865e; --clay-soft:#2a1c15; --clay-ink:#14130f;
+ --ok:#54c489; --hit:#ef7f70; --hit-soft:#2c1815;
+ }}
+ *{box-sizing:border-box}
+ html,body{height:100%;margin:0;padding:0}
+ body{display:flex;flex-direction:column;padding:var(--s4);
+ background:var(--bg);color:var(--ink);
+ font:14px/1.55 ui-sans-serif,system-ui,-apple-system,\Segoe UI\,Roboto,sans-serif;
+ -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+
+ .header{flex:none;margin-bottom:var(--s3)}
+ h1{font-size:18px;margin:0;font-weight:660;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
+ h1 .badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--r-pill);background:var(--clay-soft);color:var(--clay)}
+ .sub{color:var(--muted);font-size:12.5px;margin:4px 0 0;line-height:1.4}
+
+ .content{flex:1;display:flex;flex-direction:column;gap:var(--s2);overflow-y:auto}
+ textarea{width:100%;min-height:120px;flex:1;resize:vertical;border:1px solid var(--line);
+ border-radius:var(--r-md);background:var(--panel);color:var(--ink);padding:12px;
+ font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+ textarea::placeholder{color:var(--muted);opacity:.75}
+ textarea:focus{outline:2px solid var(--clay);outline-offset:1px;border-color:var(--clay)}
+ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+ .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+ .row{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;flex:none}
+ button{min-height:38px;padding:9px 16px;border-radius:var(--r-sm);font-weight:620;font-size:13px;
+ border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;
+ transition:background .15s ease,border-color .15s ease}
+ button:hover{border-color:var(--muted)}
+ button.primary{background:var(--clay);color:var(--clay-ink);border-color:var(--clay)}
+ button.primary:hover{background:var(--ink);border-color:var(--ink)}
+ button:disabled{opacity:.42;cursor:default}
+ button:disabled:hover{border-color:var(--line);background:var(--panel)}
+
+ label.opt{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);
+ cursor:pointer;flex:none}
+ label.opt input{accent-color:var(--clay);width:15px;height:15px;flex:none}
+
+ #summary{font-size:13px;flex:none}
+ .verdict{font-weight:680}
+ .verdict.clean{color:var(--ok)}.verdict.dirty{color:var(--clay)}
+ #chips{display:flex;gap:var(--s1);flex-wrap:wrap;flex:none}
+ .chip{font-size:11.5px;border:1px solid var(--line);border-radius:var(--r-pill);
+ padding:3px 10px;color:var(--muted);background:var(--panel)}
+ .chip b{color:var(--ink);font-weight:640}
+ #out{background:var(--raised);flex:1;min-height:100px}
+ .hint{font-size:12px;color:var(--muted);flex:none}
+
+ .footer{flex:none;margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s3)}
+ .links{display:flex;gap:var(--s2)}
+ .links a{flex:1;text-align:center;text-decoration:none;font-weight:620;font-size:12px;
+ padding:8px;border-radius:var(--r-sm);min-height:36px;display:flex;align-items:center;justify-content:center}
+ .kofi{background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay)}
+ .kofi:hover{background:var(--clay);color:var(--clay-ink)}
+ .gh{background:var(--raised);color:var(--ink);border:1px solid var(--line)}
+ .gh:hover{border-color:var(--muted)}
+ @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+ <div class=\header\>
+ <h1>Invisibles <span class=\badge\>Sidebar</span></h1>
+ <p class=\sub\>Reveal &amp; strip hidden characters offline. Zero tracking.</p>
+ </div>
+ 
+ <div class=\content\>
+ <label class=\sr-only\ for=\in\>Text to inspect</label>
+ <textarea id=\in\ placeholder=\Paste text here to inspect…\ spellcheck=\false\ autocomplete=\off\></textarea>
+ 
+ <div class=\row\>
+ <button id=\clean\ class=\primary\ type=\button\ disabled>Clean it</button>
+ <button id=\copy\ type=\button\ hidden>Copy clean text</button>
+ </div>
+ 
+ <label class=\opt\><input type=\checkbox\ id=\norm\> normalize smart quotes / em-dashes</label>
+ 
+ <div id=\summary\ role=\status\ aria-live=\polite\></div>
+ <div id=\chips\></div>
+ 
+ <label class=\sr-only\ for=\out\>Clean text</label>
+ <textarea id=\out\ readonly spellcheck=\false\ hidden></textarea>
+ <div class=\hint\ id=\delta\ aria-live=\polite\></div>
+ </div>
+
+ <div class=\footer\>
+ <div class=\links\>
+ <a class=\kofi\ href=\https://ko-fi.com/jju1s\ target=\_blank\ rel=\noopener\>☕ Ko-fi</a>
+ <a class=\gh\ href=\https://github.com/cig13zs/invisibles\ target=\_blank\ rel=\noopener\>GitHub</a>
+ </div>
+ </div>
+
+<script src=\core.js\></script>
+<script src=\popup.js\></script>
+</body>
+</html>
