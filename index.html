@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Invisibles: see the hidden characters in your text and remove them</title>
-<meta name="description" content="Paste text and see the invisible characters hiding in it: zero-width spaces, fake spaces, direction controls, the odd characters that ride along in text copied out of an AI. Then strip them in one click. Runs in your browser, nothing gets uploaded.">
+<title>Invisibles: find and remove hidden Unicode locally</title>
+<meta name="description" content="Reveal zero-width spaces, look-alike whitespace, bidi controls, and other hidden Unicode in pasted text. Review and clean it locally in your browser.">
 <meta property="og:title" content="Invisibles">
 <meta property="og:description" content="See the invisible characters hiding in your text, then remove them. Runs in your browser.">
 <meta property="og:type" content="website">
@@ -102,11 +102,9 @@
 
 <section>
   <h2>What goes wrong</h2>
-  <p class="muted">One invisible character kept a PlayStation trophy stuck at 99.8% for ten years.
-  The same kind of character breaks CSV and JSON imports, stops a password from matching when it
-  looks identical, and throws off code search. Text pasted out of an AI often carries a few of them
-  too, like the narrow no-break space at <code>U+202F</code>. Your editor doesn't draw any of it, so
-  you usually find out only after something breaks.</p>
+  <p class="muted">Hidden Unicode can make two strings look identical while comparing differently,
+  break field names in data imports, and alter how source code is displayed. Invisibles shows the
+  character, category, and code point so you can decide what to change.</p>
 </section>
 
 <section>
@@ -119,19 +117,17 @@
     <dt>Direction controls</dt>
     <dd>Right-to-left overrides and isolates. These can reorder text on screen so it reads differently from what's stored, which is the basis of the Trojan Source trick.</dd>
     <dt>Tag characters and variation selectors</dt>
-    <dd>Invisible characters that can smuggle a hidden message, prompt, or watermark inside ordinary-looking text.</dd>
+    <dd>Invisible characters that still change the stored Unicode sequence.</dd>
   </dl>
-  <p class="muted" style="margin-top:16px">Fake spaces get turned back into a normal space so words
-  don't run together. Everything else is removed. If you tick the box, it also swaps the fancy
-  punctuation (curly quotes, em dashes, ellipsis) for plain ASCII, which is handy when you're
-  scrubbing the typographic giveaways out of AI text.</p>
+  <p class="muted" style="margin-top:16px">Look-alike spaces are replaced with normal spaces so
+  words don't run together. Other flagged characters are removed. The optional checkbox also
+  converts curly quotes, em dashes, and ellipses to plain ASCII when a target system needs it.</p>
 </section>
 
 <section>
   <h2>It doesn't upload anything</h2>
-  <p class="muted">Most tools for this are websites you paste into, which means your text lands on
-  their server first. This one has no server. It's a single page and one small script you can read
-  in a couple of minutes. Works offline, and it's free.</p>
+  <p class="muted">The scanner and cleaner run entirely in this page. There is no server-side text
+  processing, analytics, or account. You can download the source and run it offline.</p>
   <p><a href="https://github.com/cig13zs/invisibles">Source on GitHub</a> if you'd rather run it yourself,
   or grab the <a href="https://github.com/cig13zs/invisibles/releases">browser extension</a> so it's a click away from any tab.</p>
 </section>
@@ -206,14 +202,15 @@
   }
 
   function doClean() {
-    var t = I.clean(inEl.value);
+    var before = inEl.value, r = I.scan(before), t = I.clean(before);
     if (normEl.checked) t = I.normalizePunctuation(t);
     outEl.value = t;
     outbox.hidden = false;
-    var before = inEl.value.length, after = t.length;
-    delta.textContent = before !== after
-      ? (before - after) + ' character' + (before-after===1?'':'s') + ' removed.'
-      : 'Punctuation normalized.';
+    var swapped = r.counts.space || 0, deleted = r.total - swapped, parts = [];
+    if (deleted) parts.push(deleted + ' removed');
+    if (swapped) parts.push(swapped + ' turned into a normal space');
+    if (!parts.length) delta.textContent = normEl.checked ? 'Punctuation normalized.' : 'Nothing to change.';
+    else delta.textContent = parts.join(', ') + '.' + (normEl.checked ? ' Punctuation normalized.' : '');
     outEl.style.height = 'auto';
     outEl.style.height = Math.min(outEl.scrollHeight + 4, 320) + 'px';
   }

@@ -2,6 +2,7 @@ const assert = require('assert');
 const fs = require('fs');
 
 const panel = fs.readFileSync('extension/sidepanel.html', 'utf8');
+const site = fs.readFileSync('index.html', 'utf8');
 const manifest = JSON.parse(fs.readFileSync('extension/manifest.json', 'utf8'));
 
 assert.match(panel, /<html lang="en">/);
@@ -25,5 +26,9 @@ for (const iconPath of new Set([
 assert.strictEqual(manifest.background.service_worker, 'background.js');
 assert.ok(fs.existsSync('extension/background.js'));
 assert.ok(!fs.existsSync('extension/popup.html'), 'unused popup document should not ship');
+
+assert.match(site, /swapped = r\.counts\.space \|\| 0/);
+assert.match(site, /turned into a normal space/);
+assert.doesNotMatch(site, /PlayStation trophy|typographic giveaways|AI watermark/i);
 
 console.log('ok, Invisibles site and manifest checks passed');
