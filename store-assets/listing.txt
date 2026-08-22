@@ -1,0 +1,19 @@
+Invisibles: Hidden Unicode Cleaner
+
+Reveal zero-width spaces, bidi controls and look-alike whitespace, then clean them locally.
+
+Paste text into the side panel to see the hidden characters it contains. Invisibles names each category and code point before you choose whether to clean the text.
+
+It can find zero-width characters, non-breaking and look-alike spaces, bidirectional controls, soft hyphens, tag characters, variation selectors, and other non-printing controls. Look-alike spaces become normal spaces; other flagged characters are removed. Optional punctuation normalization is off by default.
+
+Privacy and access
+
+- No host access: the extension cannot read the pages you visit.
+- No account, analytics, advertising, or remote service.
+- Pasted text is processed locally and is not collected or transmitted.
+- The only requested permission is sidePanel, used to open the tool beside the current tab.
+
+Invisibles identifies characters, not authorship or intent. Some hidden characters are legitimate, so review the findings before cleaning.
+
+Category: Tools
+Language: English

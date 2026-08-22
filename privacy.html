@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Invisibles privacy policy</title>
-<meta name="description" content="Invisibles collects no data of any kind. It makes no network requests, stores nothing, and declares no permissions.">
+<meta name="description" content="Invisibles collects no data, makes no processing requests, and uses only Chrome's side-panel UI permission.">
 <meta name="theme-color" content="#161613">
 <link rel="canonical" href="https://cig13zs.github.io/invisibles/privacy.html">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='25' font-size='24'>&#128065;</text></svg>">
@@ -30,7 +30,7 @@
 <div class="wrap">
 
 <h1>Privacy policy</h1>
-<p class="sub">Invisibles browser extension and web app &middot; last updated 3 August 2026</p>
+<p class="sub">Invisibles browser extension and web app &middot; last updated 23 August 2026</p>
 
 <h2>The short version</h2>
 <p>Invisibles collects nothing, stores nothing and transmits nothing. There is no server, no
@@ -61,16 +61,21 @@ is sent anywhere.</p>
 and those APIs appear nowhere in it.</p>
 
 <h2>Permissions</h2>
-<p>The extension declares no <code>permissions</code> and no <code>host_permissions</code> in its
-manifest. It cannot read the pages you visit, it has no access to your tabs, your history or your
-files, and it cannot act outside its own popup. Read <code>manifest.json</code> in the extension
-folder and you will find no permissions key at all.</p>
+<p>The extension declares one UI permission: <code>sidePanel</code>. That permission lets Chrome open
+Invisibles beside the current tab when you click its toolbar icon. The extension declares no
+<code>host_permissions</code>, so it cannot read the pages you visit. It has no access to your tabs,
+history, cookies or files.</p>
+
+<h2>Chrome Web Store Limited Use</h2>
+<p>Invisibles' use of information received from Chrome APIs complies with the Chrome Web Store User
+Data Policy, including its Limited Use requirements. The extension does not collect, transfer, sell
+or use Chrome API data for advertising, credit decisions or any purpose unrelated to its visible
+text-cleaning feature.</p>
 
 <h2>Network access</h2>
-<p>Invisibles makes no network requests. It contains no remote code, no third-party libraries, no
-fonts loaded from elsewhere and no tracking scripts. Because it never opens a connection, it cannot
-transmit your text even in principle. Open your browser's network tab and watch it stay empty while
-you use it.</p>
+<p>The text-processing code makes no network requests. It contains no remote code, no third-party
+libraries, no fonts loaded from elsewhere and no tracking scripts. The GitHub and Ko-fi links open
+those sites only after you click them; pasted text is never included in either navigation.</p>
 <p>The same is true of the web app at
 <a href="https://cig13zs.github.io/invisibles/">cig13zs.github.io/invisibles</a>, which is one HTML
 file and one script. GitHub serves that page and will see the request for it in the way any web

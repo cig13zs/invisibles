@@ -2,8 +2,8 @@
 
 Paste text, see every hidden character in it with its name and code point, then
 click once to strip them. Zero-width spaces, non-breaking spaces that look like
-real ones, direction controls, the odd characters that ride along in text copied
-out of an AI.
+real ones, direction controls, and the odd characters that ride along when text
+moves between editors, documents, chat apps, and websites.
 
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-buy_me_a_coffee-FF5E5B?style=flat-square&logo=ko-fi&logoColor=white)](https://ko-fi.com/jju1s)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
@@ -13,17 +13,17 @@ Web app: **[cig13zs.github.io/invisibles](https://cig13zs.github.io/invisibles/)
 Or install the [browser extension](#browser-extension) so it's one click from
 any tab, offline.
 
-One invisible character kept a PlayStation trophy stuck for ten years. The same
-thing breaks CSV and JSON imports, stops passwords matching, throws off code
-search, and hides in text pasted out of ChatGPT. Most editors never draw these
-characters, so you find out after something breaks.
+A single invisible character can break CSV and JSON imports, stop strings from
+matching, or throw off code search. Most editors do not draw these characters,
+so the problem often appears somewhere downstream.
 
-Almost every other tool for this is a website you paste into, which means your
-text goes to their server first. This one has no server. It's one HTML page and
-one small script, and it works offline.
+Paste tools are not always clear about how they handle input. This repository is
+deliberately auditable: it has no server, analytics, or remote processing. The
+web app is one HTML page and one small script, and it works offline.
 
-There are two builds sharing one engine (`core.js`): the web app, and a popup
-extension that declares no permissions.
+There are two builds sharing one engine (`core.js`): the web app and a side-panel
+extension. The extension requests only Chrome's `sidePanel` permission and no
+host access, so it cannot read the pages you visit.
 
 ## What it looks for
 
@@ -39,12 +39,12 @@ extension that declares no permissions.
 
 Look-alike spaces get replaced with a normal space so words don't run together.
 Everything else is removed. There's an optional toggle that also swaps fancy
-punctuation (curly quotes, em dashes, ellipsis) for plain ASCII, for scrubbing
-typographic giveaways out of AI text.
+punctuation (curly quotes, em dashes, ellipsis) for plain ASCII when a target
+system does not handle typographic characters reliably.
 
 ## Browser extension
 
-Opens directly as a Chrome Side Panel. Click the toolbar icon, and it docks cleanly on the side of your browser without floating in front of your page content. Paste, clean, copy. It declares no remote permissions and no host access, so it can't read any page you visit, and it works completely offline.
+Opens directly as a Chrome Side Panel. Click the toolbar icon, and it docks cleanly on the side of your browser without floating in front of your page content. Paste, clean, copy. It declares no remote permissions and no host access, so it cannot read any page you visit, and it works completely offline.
 
 Load it unpacked in Chrome, Edge, Brave or Opera:
 
@@ -76,11 +76,17 @@ I.normalizePunctuation('“a”—b');  // '"a"--b'  (opt-in)
 core.js        classify() + scan() + clean() + normalizePunctuation()
 core.test.js   node core.test.js
 index.html     the web app. No framework, no build step
-extension/     MV3 popup, no permissions
+extension/     MV3 side panel, sidePanel permission only
+scripts/       deterministic Chrome Web Store package builder
+store-assets/  listing copy, reproducible screenshots, and submission notes
+tools/         deterministic icon generator
 ```
 
 ```bash
 node core.test.js
+node site.test.js
+python tests/package.test.py
+node store-assets.test.js
 ```
 
 ## Limits
@@ -96,9 +102,8 @@ characters that are actually there.
 
 ## More tools
 
-- [Carryover](https://github.com/cig13zs/carryover), AI chat context transfer for ChatGPT, DeepSeek and Grok
-- [Rinse](https://github.com/cig13zs/rinse), see the GPS in a photo and wash it off
-- [Return Google Cache](https://github.com/cig13zs/return-google-cache), put the Cached link back on Google results
-- [Return 100 Results](https://github.com/cig13zs/return-100-results), browse ~100 Google results as one page
+- [Toolfold](https://github.com/cig13zs/toolfold), selected local developer utilities in one PWA
+- [Plusminus](https://github.com/cig13zs/plusminus), measurement uncertainty budgets from instrument specifications
+- [Rinse](https://github.com/cig13zs/rinse), inspect and remove location metadata from a photo
 
 MIT licensed. [Ko-fi](https://ko-fi.com/jju1s) if it saved you a headache.

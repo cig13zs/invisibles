@@ -1,3 +1,4 @@
-invisibles-extension.zip
 *.zip
-store-assets/
+dist/
+__pycache__/
+*.py[cod]
