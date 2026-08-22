@@ -1,6 +1,4 @@
-// Lives in its own file because MV3's default extension-page CSP is
-// script-src 'self', which refuses an inline <script> outright. Inlined, none of
-// this ran: the popup rendered and every control was dead.
+// MV3's default extension-page CSP requires this controller to be external.
 (function(){
   var I=window.Invisibles;
   var inEl=document.getElementById('in'),cleanBtn=document.getElementById('clean'),
@@ -27,9 +25,7 @@
     var before=inEl.value, t=I.clean(before);
     if(norm.checked) t=I.normalizePunctuation(t);
     out.value=t; out.hidden=false; copyBtn.hidden=false;
-    // A look-alike space becomes a real space, so it never shows up in a length
-    // difference. Reporting only that difference read as "found 4, removed 2",
-    // which looks like it missed two.
+    // Report replacements separately because they do not change string length.
     var r=I.scan(before), swapped=r.counts.space||0, deleted=r.total-swapped, parts=[];
     if(deleted) parts.push(deleted+' removed');
     if(swapped) parts.push(swapped+' turned into a normal space');

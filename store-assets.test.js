@@ -18,8 +18,10 @@ function checkPng(relative, width, height) {
 }
 
 const screenshotHash = checkPng('store-assets/screenshot-1280x800.png', 1280, 800);
+const reviewHash = checkPng('store-assets/screenshot-review-1280x800.png', 1280, 800);
 const promoHash = checkPng('store-assets/promo-440x280.png', 440, 280);
 assert.notStrictEqual(screenshotHash, promoHash);
+assert.strictEqual(new Set([screenshotHash, reviewHash, promoHash]).size, 3);
 
 const capture = fs.readFileSync(path.join(__dirname, 'store-assets', 'capture.js'), 'utf8');
 const bootstrap = fs.readFileSync(
@@ -30,8 +32,10 @@ assert.match(capture, /path\.join\(root, 'extension', 'sidepanel\.html'\)/);
 assert.match(capture, /path\.join\(root, 'extension', 'core\.js'\)/);
 assert.match(capture, /path\.join\(root, 'extension', 'popup\.js'\)/);
 assert.ok(capture.includes('data-capture-ready'));
+assert.ok(capture.includes('screenshot-review.html'));
 assert.ok(bootstrap.includes("document.getElementById('in')"));
 assert.ok(bootstrap.includes("document.getElementById('clean')"));
+assert.ok(bootstrap.includes("mode === 'review'"));
 
 const listing = fs.readFileSync(path.join(__dirname, 'store-assets', 'listing.txt'), 'utf8');
 assert.match(listing, /no host access/i);
@@ -45,4 +49,5 @@ assert.ok(!promoSource.includes('readynow'));
 
 console.log('store assets ok');
 console.log('screenshot sha256 ' + screenshotHash);
+console.log('review screenshot sha256 ' + reviewHash);
 console.log('promo sha256 ' + promoHash);

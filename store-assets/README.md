@@ -8,7 +8,7 @@ python scripts/package.py --check
 python tests/package.test.py
 ```
 
-Upload `dist/invisibles-1.2.0.zip` and compare its SHA-256 value with the checked checksum sidecar.
+Upload `dist/invisibles-1.2.1.zip` and compare its SHA-256 value with the checked checksum sidecar.
 
 Use the copy in `listing.txt`, category `Tools`, and the public privacy URL:
 
@@ -19,9 +19,12 @@ The privacy dashboard should disclose that users paste text into the extension a
 ## Images
 
 - `screenshot-1280x800.png` is the main product screenshot.
+- `screenshot-review-1280x800.png` shows the review-before-cleaning state.
 - `promo-440x280.png` is the small promotional tile.
 
-The screenshot embeds the shipped `extension/sidepanel.html`, runs the shipped `core.js` and `popup.js`, and fills it with a fictional local sample. It does not use a signed-in browser profile or real user text.
+The screenshots embed the shipped `extension/sidepanel.html`, run the shipped
+`core.js` and `popup.js`, and fill the panel with fictional local samples.
+They do not use a signed-in browser profile or real user text.
 
 Rebuild and verify the PNG files with local Chrome:
 

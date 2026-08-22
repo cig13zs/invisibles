@@ -8,11 +8,12 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "extension" / "icons"
 SIZES = (16, 48, 128)
+ARTWORK_SIZE = 512
+SAFE_AREA_RATIO = 0.75
 
 
-def make_master() -> Image.Image:
-    size = 512
-    image = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+def make_artwork() -> Image.Image:
+    image = Image.new("RGBA", (ARTWORK_SIZE, ARTWORK_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image, "RGBA")
 
     draw.rounded_rectangle((18, 18, 494, 494), radius=112, fill=(21, 73, 72, 255))
@@ -33,11 +34,23 @@ def make_master() -> Image.Image:
     return image
 
 
+def icon_for_size(artwork: Image.Image, size: int) -> Image.Image:
+    content_size = round(size * SAFE_AREA_RATIO)
+    offset = (size - content_size) // 2
+    content = artwork.resize((content_size, content_size), Image.Resampling.LANCZOS)
+    icon = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    icon.alpha_composite(content, (offset, offset))
+    expected = (offset, offset, offset + content_size, offset + content_size)
+    if icon.getbbox() != expected:
+        raise RuntimeError(f"icon{size}.png exceeds its {content_size}x{content_size} safe area")
+    return icon
+
+
 def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    master = make_master()
+    artwork = make_artwork()
     for size in SIZES:
-        icon = master.resize((size, size), Image.Resampling.LANCZOS)
+        icon = icon_for_size(artwork, size)
         icon.save(OUTPUT / f"icon{size}.png", format="PNG", optimize=True)
     print("generated Invisibles icons: " + ", ".join(str(size) for size in SIZES))
 

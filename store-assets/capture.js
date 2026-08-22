@@ -153,11 +153,11 @@ async function capture(browser, port, source, destination, width, height) {
   await runChrome(browser, args, profile, false);
 }
 
-async function verifyScreenshotPage(browser, port) {
+async function verifyScreenshotPage(browser, port, source) {
   const profile = path.join(os.tmpdir(), 'invisibles-asset-' + process.pid + '-verify');
   const args = chromeArgs(profile, 1280, 800).concat([
     '--dump-dom',
-    'http://127.0.0.1:' + port + '/store-assets/source/screenshot.html'
+    'http://127.0.0.1:' + port + source
   ]);
   const output = await runChrome(browser, args, profile, true);
   if (!/data-capture-ready=["']true["']/.test(output)) {
@@ -177,17 +177,28 @@ async function main() {
   const server = http.createServer(serve);
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const port = server.address().port;
-  const screenshot = path.join(outputDir, 'screenshot-1280x800.png');
+  const screenshots = [
+    {
+      source: '/store-assets/source/screenshot.html',
+      file: path.join(outputDir, 'screenshot-1280x800.png')
+    },
+    {
+      source: '/store-assets/source/screenshot-review.html',
+      file: path.join(outputDir, 'screenshot-review-1280x800.png')
+    }
+  ];
   const promo = path.join(outputDir, 'promo-440x280.png');
   try {
-    await verifyScreenshotPage(browser, port);
-    await capture(browser, port, '/store-assets/source/screenshot.html', screenshot, 1280, 800);
+    for (const screenshot of screenshots) {
+      await verifyScreenshotPage(browser, port, screenshot.source);
+      await capture(browser, port, screenshot.source, screenshot.file, 1280, 800);
+    }
     await capture(browser, port, '/store-assets/source/promo.html', promo, 440, 280);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }
 
-  [screenshot, promo].forEach((file) => {
+  [...screenshots.map((screenshot) => screenshot.file), promo].forEach((file) => {
     const size = pngSize(file);
     console.log(
       path.relative(root, file).replace(/\\/g, '/') + ' ' + size.width + 'x' + size.height +
