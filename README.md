@@ -44,7 +44,7 @@ system does not handle typographic characters reliably.
 
 ## Browser extension
 
-Opens directly as a Chrome Side Panel. Click the toolbar icon, and it docks cleanly on the side of your browser without floating in front of your page content. Paste, clean, copy. It declares no remote permissions and no host access, so it cannot read any page you visit, and it works completely offline.
+Opens directly as a Chrome Side Panel. Click the toolbar icon, and it docks cleanly on the side of your browser without floating in front of your page content. Paste, clean, copy. The panel states before input that pasted text stays in the panel and is never stored or uploaded. It declares no remote permissions and no host access, so it cannot read any page you visit, and it works completely offline.
 
 Load it unpacked in Chrome, Edge, Brave or Opera:
 

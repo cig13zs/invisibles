@@ -39,7 +39,8 @@ assert.ok(bootstrap.includes("mode === 'review'"));
 
 const listing = fs.readFileSync(path.join(__dirname, 'store-assets', 'listing.txt'), 'utf8');
 assert.match(listing, /no host access/i);
-assert.match(listing, /not collected or transmitted/i);
+assert.match(listing, /processed only in memory/i);
+assert.match(listing, /never stored or transmitted/i);
 assert.match(listing, /identifies characters, not authorship or intent/i);
 assert.doesNotMatch(listing, /detects ai writing|guaranteed|100% safe/i);
 

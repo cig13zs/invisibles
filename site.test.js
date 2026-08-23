@@ -11,10 +11,13 @@ assert.match(panel, /name="viewport"/);
 assert.match(panel, /name="description"/);
 assert.match(panel, /<script src="core\.js"><\/script>/);
 assert.match(panel, /<script src="popup\.js"><\/script>/);
+assert.match(panel, /pasted text stays in this panel and is never stored or uploaded/i);
+assert.match(panel, /href="https:\/\/cig13zs\.github\.io\/invisibles\/privacy\.html"/);
 assert.ok(!panel.includes('=\\'), 'side-panel attributes must not use escaped pseudo-quotes');
 assert.ok(!panel.includes('\\>'), 'side-panel tags must close normally');
 
 assert.deepStrictEqual(manifest.permissions, ['sidePanel']);
+assert.strictEqual(manifest.version, '1.2.2');
 assert.ok(!manifest.host_permissions, 'the extension must not request host access');
 assert.strictEqual(manifest.side_panel.default_path, 'sidepanel.html');
 for (const iconPath of new Set([

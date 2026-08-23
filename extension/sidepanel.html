@@ -71,15 +71,15 @@
  padding:8px;border-radius:var(--r-sm);min-height:36px;display:flex;align-items:center;justify-content:center}
  .kofi{background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay)}
  .kofi:hover{background:var(--clay);color:var(--clay-ink)}
- .gh{background:var(--raised);color:var(--ink);border:1px solid var(--line)}
- .gh:hover{border-color:var(--muted)}
+ .gh,.privacy{background:var(--raised);color:var(--ink);border:1px solid var(--line)}
+ .gh:hover,.privacy:hover{border-color:var(--muted)}
  @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
  <div class="header">
  <h1>Invisibles <span class="badge">Sidebar</span></h1>
- <p class="sub">Reveal and strip hidden characters offline. Zero tracking.</p>
+ <p class="sub">Processed locally: pasted text stays in this panel and is never stored or uploaded.</p>
  </div>
 
  <div class="content">
@@ -105,6 +105,7 @@
  <div class="links">
  <a class="kofi" href="https://ko-fi.com/jju1s" target="_blank" rel="noopener">Ko-fi</a>
  <a class="gh" href="https://github.com/cig13zs/invisibles" target="_blank" rel="noopener">GitHub</a>
+ <a class="privacy" href="https://cig13zs.github.io/invisibles/privacy.html" target="_blank" rel="noopener">Privacy</a>
  </div>
  </div>
 
