@@ -58,12 +58,23 @@
  #summary{font-size:13px;flex:none}
  .verdict{font-weight:680}
  .verdict.clean{color:var(--ok)}.verdict.dirty{color:var(--clay)}
- #chips{display:flex;gap:var(--s1);flex-wrap:wrap;flex:none}
- .chip{font-size:11.5px;border:1px solid var(--line);border-radius:var(--r-pill);
- padding:3px 10px;color:var(--muted);background:var(--panel)}
- .chip b{color:var(--ink);font-weight:640}
+#chips{display:flex;gap:var(--s1);flex-wrap:wrap;flex:none}
+button.chip{min-height:0;padding:3px 10px;font-size:11.5px;font-weight:400;
+border-radius:var(--r-pill);color:var(--muted);background:var(--panel);
+border:1px solid var(--line);text-transform:none}
+button.chip b{color:var(--ink);font-weight:640}
+button.chip[aria-pressed="false"]{opacity:.45;text-decoration:line-through}
+#preview{display:none;flex:none;max-height:150px;overflow-y:auto;border:1px solid var(--line);
+border-radius:var(--r-md);background:var(--panel);padding:9px 12px;
+font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
+.mark{background:var(--hit-soft);color:var(--hit);border-radius:4px;padding:0 3px;
+cursor:help;border-bottom:2px dotted var(--hit)}
+.mark.zero-width{border-bottom-style:solid}
  #out{background:var(--raised);flex:1;min-height:100px}
- .hint{font-size:12px;color:var(--muted);flex:none}
+.hint{font-size:12px;color:var(--muted);flex:none}
+.dropzone{flex:none;text-align:center;font-size:12px;color:var(--muted);
+border:1px dashed var(--line);border-radius:var(--r-md);padding:7px;cursor:pointer}
+.dropzone.over{border-color:var(--clay);color:var(--clay)}
 
  .footer{flex:none;margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s3)}
  .links{display:flex;gap:var(--s2)}
@@ -95,11 +106,13 @@
 
  <div id="summary" role="status" aria-live="polite"></div>
  <div id="chips"></div>
+ <div id="preview" aria-label="Where the hidden characters sit in your text"></div>
 
  <label class="sr-only" for="out">Clean text</label>
  <textarea id="out" readonly spellcheck="false" hidden></textarea>
  <div class="hint" id="delta" aria-live="polite"></div>
  </div>
+ <div class="dropzone" id="drop" title="Load a text file">...or drop a .txt / .md / .csv file here</div>
 
  <div class="footer">
  <div class="links">

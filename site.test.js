@@ -17,7 +17,7 @@ assert.ok(!panel.includes('=\\'), 'side-panel attributes must not use escaped ps
 assert.ok(!panel.includes('\\>'), 'side-panel tags must close normally');
 
 assert.deepStrictEqual(manifest.permissions, ['sidePanel']);
-assert.strictEqual(manifest.version, '1.2.2');
+assert.strictEqual(manifest.version, '1.3.0');
 assert.ok(!manifest.host_permissions, 'the extension must not request host access');
 assert.strictEqual(manifest.side_panel.default_path, 'sidepanel.html');
 for (const iconPath of new Set([

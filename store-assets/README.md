@@ -8,7 +8,7 @@ python scripts/package.py --check
 python tests/package.test.py
 ```
 
-Upload `dist/invisibles-1.2.2.zip` and compare its SHA-256 value with the checked checksum sidecar.
+Upload `dist/invisibles-1.3.0.zip` and compare its SHA-256 value with the checked checksum sidecar.
 
 Expected SHA-256:
 

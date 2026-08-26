@@ -117,6 +117,48 @@
     return out;
   }
 
+  // clean(text, opts) with opts.skip: categories to leave untouched, so the
+  // panel can offer per-category cleaning instead of all-or-nothing.
+  function cleanWith(text, skip) {
+    if (!skip || !skip.length) return clean(text);
+    if (typeof text !== 'string') return '';
+    var out = '';
+    for (var idx = 0; idx < text.length; ) {
+      var cp = text.codePointAt(idx);
+      var c = classify(cp);
+      if (!c) out += String.fromCodePoint(cp);
+      else if (skip.indexOf(c.category) !== -1) out += String.fromCodePoint(cp);
+      else if (c.action === 'space') out += ' ';
+      idx += cp > 0xFFFF ? 2 : 1;
+    }
+    return out;
+  }
+
+  // visualize(text) -> array of segments: {text} for normal runs,
+  // {hidden:true, label, hex, category} for each flagged character. The UI
+  // renders hidden ones as visible marks so people can see WHERE the problems
+  // sit inside their own text.
+  function visualize(text) {
+    var segments = [];
+    if (typeof text !== 'string' || !text) return segments;
+    var findings = {};
+    scan(text).findings.forEach(function (f) { findings[f.index] = f; });
+    var run = '';
+    for (var idx = 0; idx < text.length; ) {
+      var cp = text.codePointAt(idx);
+      var f = findings[idx];
+      if (f) {
+        if (run) { segments.push({ text: run }); run = ''; }
+        segments.push({ hidden: true, label: nameOf(cp), hex: f.hex, category: f.category });
+      } else {
+        run += String.fromCodePoint(cp);
+      }
+      idx += cp > 0xFFFF ? 2 : 1;
+    }
+    if (run) segments.push({ text: run });
+    return segments;
+  }
+
   // normalizePunctuation(text) -> opt-in: fancy typography down to plain ASCII.
   // Separate from clean() because these characters are visible and often wanted.
   function normalizePunctuation(text) {
@@ -133,11 +175,13 @@
   return {
     scan: scan,
     clean: clean,
+    cleanWith: cleanWith,
+    visualize: visualize,
     normalizePunctuation: normalizePunctuation,
     classify: classify,
     nameOf: nameOf,
     hex: hex,
     CATEGORIES: CATEGORIES,
-    VERSION: '1.1.0'
+    VERSION: '1.3.0'
   };
 });
