@@ -83,6 +83,16 @@ server sees a request, which is covered by
 <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub's
 privacy statement</a>. Nothing you paste into the page is part of that.</p>
 
+<h2>Reporting a miss</h2>
+<p>There is a "Report a miss" link in the side panel, for when a hidden character slips past or
+something gets flagged that should have been left alone. It does nothing until you press it. When
+you do, it builds a short note, copies it to your clipboard and opens a pre-filled GitHub issue so
+you can read it, edit it and decide whether to submit it.</p>
+<p><strong>Your text is not in that note.</strong> It contains the code points that were flagged
+(for example "U+200B Zero-Width Space x3"), the length of what you pasted, and how many of those
+characters were non-ASCII. That is enough to add a missing rule and useless to anyone reading it as
+content. Nothing is gathered in the background and nothing is ever sent on its own.</p>
+
 <h2>Third parties</h2>
 <p>No data is shared with third parties, because none is collected. Invisibles is not affiliated
 with, endorsed by or connected to OpenAI or any other AI provider.</p>

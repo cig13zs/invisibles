@@ -5,7 +5,8 @@
       copyBtn=document.getElementById('copy'),norm=document.getElementById('norm'),
       summary=document.getElementById('summary'),chips=document.getElementById('chips'),
       out=document.getElementById('out'),delta=document.getElementById('delta'),
-      preview=document.getElementById('preview'),drop=document.getElementById('drop');
+      preview=document.getElementById('preview'),drop=document.getElementById('drop'),
+      reportBtn=document.getElementById('report'),reportMsg=document.getElementById('reportmsg');
 
   // Categories the user toggled OFF; they stay in the text when cleaning.
   var skipped=[];
@@ -96,6 +97,63 @@
 
   document.addEventListener('keydown',function(ev){
     if((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter'&&!cleanBtn.disabled){doClean();}
+  });
+
+  // --- reporting a miss ------------------------------------------------------
+  // The only feedback channel this extension has, and the only thing in it that
+  // can leave the browser. It runs when the link is pressed and never before.
+  //
+  // What it must NOT contain is the text. The whole promise here is that your
+  // text stays put, and a bug report that quietly shipped it would break that
+  // promise at the exact moment someone is trying to help. So the note carries
+  // only the code points that were flagged, plus two counts - enough to add a
+  // missing rule, useless to anyone reading it as content.
+  function reportBody(){
+    var NL=String.fromCharCode(10), text=inEl.value, r=I.scan(text), seen={}, lines=[], i, cp;
+
+    for(i=0;i<r.findings.length;i++){
+      var f=r.findings[i];
+      if(!seen[f.hex]) seen[f.hex]={n:0,name:f.name,cat:f.category};
+      seen[f.hex].n++;
+    }
+    Object.keys(seen).sort().forEach(function(h){
+      lines.push('- '+h+'  '+seen[h].name+'  ('+seen[h].cat+') x'+seen[h].n);
+    });
+
+    // A count, not the characters. A missed character is almost always
+    // non-ASCII, so the gap between this number and the flagged total is the
+    // first thing worth looking at.
+    var nonAscii=0;
+    for(i=0;i<text.length;){
+      cp=text.codePointAt(i);
+      if(cp>127) nonAscii++;
+      i+=cp>0xFFFF?2:1;
+    }
+
+    var v=(typeof chrome!=='undefined'&&chrome.runtime&&chrome.runtime.getManifest)
+      ?chrome.runtime.getManifest().version:'?';
+    var body=['### What looked wrong','',
+      '<!-- Did it miss a hidden character, or flag one it should have kept? -->','',
+      '### What the scan saw','',
+      'Invisibles '+v,
+      'Input: '+text.length+' characters, '+nonAscii+' of them non-ASCII',
+      'Flagged: '+r.total,''];
+    if(lines.length) body=body.concat(lines,['']);
+    body.push('---','Built when the link was pressed. Your text is not included - only the '+
+      'code points that were flagged, and the two counts above.');
+    return body.join(NL);
+  }
+
+  if(reportBtn) reportBtn.addEventListener('click',function(ev){
+    ev.preventDefault();
+    var text=reportBody();
+    // Clipboard first, so someone without a GitHub account can still paste it
+    // into a store review or a message.
+    try{ navigator.clipboard.writeText(text); }catch(_){}
+    window.open('https://github.com/cig13zs/invisibles/issues/new'+
+      '?title='+encodeURIComponent('Missed or wrongly flagged character')+
+      '&body='+encodeURIComponent(text.slice(0,6000)),'_blank','noopener');
+    if(reportMsg) reportMsg.textContent='Copied and opened on GitHub. Your text was not included.';
   });
 
   inEl.addEventListener('input',render);
