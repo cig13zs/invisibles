@@ -48,6 +48,9 @@
   .chip b{color:var(--ink)}
   .reveal{margin-top:16px;padding:14px;border:1px dashed var(--line);border-radius:10px;background:var(--bg);font:14.5px/1.9 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow:auto}
   .reveal:empty{display:none}
+  .hidden-msg{margin-top:12px;padding:10px 14px;border:1px solid var(--hit);border-radius:10px;background:var(--hit-soft);font-size:14px}
+  .hidden-msg p{margin:0}.hidden-msg p+p{margin-top:6px}
+  .hidden-msg q{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);word-break:break-word}
   .hit{display:inline-block;min-width:1.1em;text-align:center;background:var(--hit-soft);color:var(--hit);border:1px solid var(--hit);border-radius:4px;padding:0 3px;margin:0 1px;font-size:11px;font-weight:700;vertical-align:middle;cursor:help}
   .hint{font-size:12.5px;color:var(--muted);margin-top:10px}
   .out{margin-top:14px}
@@ -86,6 +89,7 @@
 
   <div class="summary" id="summary" role="status" aria-live="polite"></div>
   <div class="chips" id="chips"></div>
+  <div class="hidden-msg" id="hidden-msg" role="note" hidden></div>
   <div class="reveal" id="reveal"></div>
 
   <div class="out" id="outbox" hidden>
@@ -155,7 +159,8 @@
       outbox = document.getElementById('outbox'),
       outEl = document.getElementById('out'),
       copyBtn = document.getElementById('copy'),
-      delta = document.getElementById('delta');
+      delta = document.getElementById('delta'),
+      hiddenMsg = document.getElementById('hidden-msg');
 
   function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   var SHORT = {'zero-width':'ZW','space':'SP','bidi':'BIDI','soft-hyphen':'SHY','tag-char':'TAG','variation-selector':'VS','control':'CTRL'};
@@ -167,9 +172,31 @@
     return n ? ' Kept ' + n + ' character' + (n > 1 ? 's' : '') + ' that hold' + (n > 1 ? '' : 's') + ' emoji together.' : '';
   }
 
+  // Text hidden inside tag characters or variation selectors, decoded and shown
+  // as plain text so it can be read. Built with textContent: it is untrusted.
+  var KIND = {tag:'tag characters', selector:'variation selectors'};
+  function renderHidden(el, text){
+    var hits=text?I.decodeHidden(text):[];
+    el.replaceChildren();
+    el.hidden=!hits.length;
+    hits.slice(0,3).forEach(function(h){
+      var p=document.createElement('p'), q=document.createElement('q');
+      p.textContent='Hidden text in '+KIND[h.kind]+': ';
+      q.textContent=h.text.length>300?h.text.slice(0,300)+'...':h.text;
+      p.appendChild(q);
+      el.appendChild(p);
+    });
+    if(hits.length>3){
+      var more=document.createElement('p');
+      more.textContent='and '+(hits.length-3)+' more.';
+      el.appendChild(more);
+    }
+  }
+
   function render() {
     var text = inEl.value;
     var r = I.scan(text);
+    renderHidden(hiddenMsg, r.total ? text : '');
     cleanBtn.disabled = !text || (r.total === 0 && !normEl.checked);
 
     if (!text) { summary.innerHTML=''; chips.innerHTML=''; reveal.innerHTML=''; outbox.hidden=true; return; }

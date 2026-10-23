@@ -32,6 +32,15 @@ assert.strictEqual(manifest.background.service_worker, 'background.js');
 assert.ok(fs.existsSync('extension/background.js'));
 assert.ok(!fs.existsSync('extension/popup.html'), 'unused popup document should not ship');
 
+// Decoded hidden text is untrusted, so both UIs write it with textContent.
+const popupJs = fs.readFileSync('extension/popup.js', 'utf8');
+assert.match(panel, /id="hidden-msg"/);
+assert.match(site, /id="hidden-msg"/);
+for (const src of [popupJs, site]) {
+  assert.match(src, /I\.decodeHidden\(text\)/);
+  assert.match(src, /q\.textContent=|q\.textContent = /);
+}
+
 assert.match(site, /swapped = r\.counts\.space \|\| 0/);
 assert.match(site, /turned into a normal space/);
 assert.doesNotMatch(site, /PlayStation trophy|typographic giveaways|AI watermark/i);

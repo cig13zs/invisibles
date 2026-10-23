@@ -6,7 +6,8 @@
       summary=document.getElementById('summary'),chips=document.getElementById('chips'),
       out=document.getElementById('out'),delta=document.getElementById('delta'),
       preview=document.getElementById('preview'),drop=document.getElementById('drop'),
-      reportBtn=document.getElementById('report'),reportMsg=document.getElementById('reportmsg');
+      reportBtn=document.getElementById('report'),reportMsg=document.getElementById('reportmsg'),
+      hiddenMsg=document.getElementById('hidden-msg');
 
   // Categories the user toggled OFF; they stay in the text when cleaning.
   var skipped=[];
@@ -18,8 +19,30 @@
     return n?' Kept '+n+' character'+(n>1?'s':'')+' that hold'+(n>1?'':'s')+' emoji together.':'';
   }
 
+  // Text hidden inside tag characters or variation selectors, decoded and shown
+  // as plain text so it can be read. Built with textContent: it is untrusted.
+  var KIND = {tag:'tag characters', selector:'variation selectors'};
+  function renderHidden(el, text){
+    var hits=text?I.decodeHidden(text):[];
+    el.replaceChildren();
+    el.hidden=!hits.length;
+    hits.slice(0,3).forEach(function(h){
+      var p=document.createElement('p'), q=document.createElement('q');
+      p.textContent='Hidden text in '+KIND[h.kind]+': ';
+      q.textContent=h.text.length>300?h.text.slice(0,300)+'...':h.text;
+      p.appendChild(q);
+      el.appendChild(p);
+    });
+    if(hits.length>3){
+      var more=document.createElement('p');
+      more.textContent='and '+(hits.length-3)+' more.';
+      el.appendChild(more);
+    }
+  }
+
   function render(){
     var text=inEl.value, r=I.scan(text);
+    renderHidden(hiddenMsg, r.total?text:'');
     cleanBtn.disabled=!text||(r.total===0&&!norm.checked);
     if(!text){summary.innerHTML='';chips.innerHTML='';preview.style.display='none';return;}
     if(r.total===0){
