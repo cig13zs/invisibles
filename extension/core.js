@@ -250,6 +250,6 @@
     nameOf: nameOf,
     hex: hex,
     CATEGORIES: CATEGORIES,
-    VERSION: '1.3.1'
+    VERSION: '1.4.0'
   };
 });
