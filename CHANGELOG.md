@@ -2,6 +2,10 @@
 
 ## 1.4.0 (2026-10-23)
 
+- Hidden text shown in plain words. Text smuggled in tag characters (ASCII smuggling) or
+  packed into variation selectors is decoded and shown under the summary, so you can read
+  what was hidden before you clean it. The web app and the library (`decodeHidden`) do the
+  same.
 - Emoji stay whole. Zero-width joiners, variation selectors and tag letters that build an
   emoji (a family, a red heart, a rainbow flag, a keycap, the England flag) are no longer
   flagged or removed, and the summary says how many were kept. The same characters anywhere

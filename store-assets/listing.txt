@@ -4,7 +4,7 @@ Reveal zero-width spaces, bidi controls and look-alike whitespace, then clean th
 
 Paste text into the side panel to see the hidden characters it contains. Invisibles names each category and code point before you choose whether to clean the text.
 
-It can find zero-width characters, non-breaking and look-alike spaces, bidirectional controls, soft hyphens, tag characters, variation selectors, and other non-printing controls. Look-alike spaces become normal spaces; other flagged characters are removed. Joiners and selectors that are part of an emoji are kept, so cleaning never breaks emoji. Optional punctuation normalization is off by default.
+It can find zero-width characters, non-breaking and look-alike spaces, bidirectional controls, soft hyphens, tag characters, variation selectors, and other non-printing controls. When tag characters or variation selectors carry hidden text, the panel decodes it and shows it in plain words. Look-alike spaces become normal spaces; other flagged characters are removed. Joiners and selectors that are part of an emoji are kept, so cleaning never breaks emoji. Optional punctuation normalization is off by default.
 
 Privacy and access
 
