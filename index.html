@@ -161,6 +161,12 @@
   var SHORT = {'zero-width':'ZW','space':'SP','bidi':'BIDI','soft-hyphen':'SHY','tag-char':'TAG','variation-selector':'VS','control':'CTRL'};
   var REVEAL_LIMIT = 20000; // past this, skip the per-char DOM build; counts still show
 
+  // Joiners and selectors inside emoji are kept on purpose; say so.
+  function emojiNote(r) {
+    var n = r.emojiKept || 0;
+    return n ? ' Kept ' + n + ' character' + (n > 1 ? 's' : '') + ' that hold' + (n > 1 ? '' : 's') + ' emoji together.' : '';
+  }
+
   function render() {
     var text = inEl.value;
     var r = I.scan(text);
@@ -170,13 +176,13 @@
 
     if (r.total === 0) {
       summary.innerHTML = '<span class="verdict clean">Clean.</span> No hidden characters here.'
-        + (normEl.checked ? ' Punctuation will still be normalized.' : '');
+        + emojiNote(r) + (normEl.checked ? ' Punctuation will still be normalized.' : '');
       chips.innerHTML = ''; reveal.innerHTML = '';
       return;
     }
 
     summary.innerHTML = '<span class="verdict dirty">' + r.total + ' hidden character' +
-      (r.total>1?'s':'') + '</span> found.';
+      (r.total>1?'s':'') + '</span> found.' + emojiNote(r);
 
     var cats = Object.keys(r.counts).sort();
     chips.innerHTML = cats.map(function(c){

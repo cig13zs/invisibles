@@ -37,6 +37,12 @@ host access, so it cannot read the pages you visit.
 | Variation selectors | `U+FE00`..`U+FE0F` | Invisible; can carry hidden data |
 | Control chars | C0/C1, line and paragraph separators | Non-printing; break parsers |
 
+Emoji are left whole. A zero-width joiner, variation selector or tag letter that is
+part of an emoji (👨‍👩‍👧, ❤️, a rainbow flag, a keycap, the England flag) is not
+flagged, and the summary says how many it kept. The same characters anywhere else
+are still flagged, including extra selectors stacked on an emoji, which is a way
+to hide data.
+
 Look-alike spaces get replaced with a normal space so words don't run together.
 Everything else is removed. There's an optional toggle that also swaps fancy
 punctuation (curly quotes, em dashes, ellipsis) for plain ASCII when a target

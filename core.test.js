@@ -29,6 +29,43 @@ assert.strictEqual(I.clean(visible), visible, 'clean leaves visible text exactly
 // Opt-in punctuation normalize drops it to plain ASCII.
 assert.strictEqual(I.normalizePunctuation('“a”—b…'), '"a"--b...');
 
+// Emoji built with joiners, selectors or tag letters stay whole and are not flagged.
+var emoji = [
+  '\u{1F468}\u200D\u{1F469}\u200D\u{1F467}',         // family
+  '\u2764\uFE0F',                                    // red heart
+  '\u2764\uFE0F\u200D\u{1F525}',                      // heart on fire
+  '\u{1F469}\u{1F3FD}\u200D\u{1F4BB}',                // technologist, skin tone
+  '\u{1F3F3}\uFE0F\u200D\u{1F308}',                   // rainbow flag
+  '1\uFE0F\u20E3',                                   // keycap 1
+  '\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}' // England flag
+];
+var emojiKept = [2, 1, 2, 1, 2, 1, 6];
+emoji.forEach(function (e, i) {
+  var line = 'Note ' + e + ' done';
+  assert.strictEqual(I.scan(line).total, 0, 'emoji is not flagged: ' + e);
+  assert.strictEqual(I.scan(line).emojiKept, emojiKept[i], 'emoji parts counted: ' + e);
+  assert.strictEqual(I.clean(line), line, 'clean keeps the emoji: ' + e);
+  assert.strictEqual(I.cleanWith(line, ['space']), line, 'cleanWith keeps the emoji: ' + e);
+});
+
+// The same characters outside an emoji are still caught, including data
+// stacked on an emoji and tag letters that are not a flag.
+var smuggled = [
+  ['he\u200Dllo', 'hello'],                            // joiner between letters
+  ['A\uFE0F', 'A'],                                    // selector on a letter
+  ['\u{1F600}\uFE0F\uFE01', '\u{1F600}\uFE0F'],          // second selector stacked on an emoji
+  ['\u{1F600}\u{E0100}\u{E0101}', '\u{1F600}'],          // supplementary selectors on an emoji
+  ['\u{1F3F4}\u{E0068}\u{E0069}\u{E007F}', '\u{1F3F4}'], // tag letters spelling "hi"
+  ['\u{1F600}\u200D', '\u{1F600}'],                     // joiner with nothing after it
+  ['2\uFE0F', '2']                                     // keycap selector without the keycap
+];
+smuggled.forEach(function (pair) {
+  assert.ok(I.scan(pair[0]).total > 0, 'still flagged: ' + JSON.stringify(pair[0]));
+  assert.strictEqual(I.clean(pair[0]), pair[1], 'cleaned: ' + JSON.stringify(pair[0]));
+});
+assert.strictEqual(I.scan(null).emojiKept, 0);
+assert.deepStrictEqual(I.emojiParts('plain'), {});
+
 // Never throws on non-strings.
 assert.strictEqual(I.scan(null).total, 0);
 assert.strictEqual(I.clean(undefined), '');
