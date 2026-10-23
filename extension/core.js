@@ -84,33 +84,100 @@
     return null;
   }
 
+  // --- emoji sequences ------------------------------------------------------
+  // A zero-width joiner, a variation selector or tag characters are also how
+  // ordinary emoji are built: 👨‍👩‍👧 is three people joined by ZWJ, ❤️ is a heart
+  // plus VS16, and the England flag is a black flag plus tag letters. Stripping
+  // them breaks the emoji, so these exact uses are kept and not flagged.
+  // Anything outside them (a joiner between letters, a second selector stacked
+  // on an emoji, tag letters that spell something other than a flag) is still
+  // flagged, because that is where hidden data goes.
+  var PICTO = /\p{Extended_Pictographic}/u;
+  var KEYCAP_BASE = /[0-9#*]/;
+  // England, Scotland, Wales: the only subdivision flags emoji keyboards offer.
+  var FLAG_TAGS = ['gbeng', 'gbsct', 'gbwls'];
+
+  function isPicto(cp) { return cp !== undefined && PICTO.test(String.fromCodePoint(cp)); }
+  function isSkinTone(cp) { return cp >= 0x1F3FB && cp <= 0x1F3FF; }
+
+  function codePoints(text) {
+    var list = [];
+    for (var idx = 0; idx < text.length; ) {
+      var cp = text.codePointAt(idx);
+      list.push({ cp: cp, index: idx });
+      idx += cp > 0xFFFF ? 2 : 1;
+    }
+    return list;
+  }
+
+  // emojiParts(text) -> {index: true} for each code unit index that holds a
+  // joiner, selector or tag character belonging to a real emoji.
+  function emojiParts(text) {
+    var keep = {};
+    if (typeof text !== 'string' || !text) return keep;
+    var cps = codePoints(text);
+    for (var i = 0; i < cps.length; i++) {
+      var cp = cps[i].cp, prev = i > 0 ? cps[i - 1].cp : undefined;
+
+      if (cp === 0xFE0F || cp === 0xFE0E) {
+        // One selector right after a pictograph, or a keycap: 1️⃣ is 1 + VS16 + U+20E3.
+        var next = i + 1 < cps.length ? cps[i + 1].cp : undefined;
+        if (isPicto(prev) || (cp === 0xFE0F && KEYCAP_BASE.test(String.fromCodePoint(prev || 0x20)) && next === 0x20E3)) {
+          keep[cps[i].index] = true;
+        }
+      } else if (cp === 0x200D) {
+        // Joins two pictographs; the left one may carry a selector or a skin tone.
+        var j = i - 1;
+        while (j >= 0 && (cps[j].cp === 0xFE0F || isSkinTone(cps[j].cp))) j--;
+        var after = i + 1 < cps.length ? cps[i + 1].cp : undefined;
+        if (j >= 0 && j >= i - 2 && isPicto(cps[j].cp) && isPicto(after)) keep[cps[i].index] = true;
+      } else if (cp === 0x1F3F4) {
+        // Black flag + tag letters + cancel tag.
+        var letters = '', k = i + 1;
+        while (k < cps.length && cps[k].cp >= 0xE0061 && cps[k].cp <= 0xE007A && letters.length < 6) {
+          letters += String.fromCharCode(cps[k].cp - 0xE0000);
+          k++;
+        }
+        if (k < cps.length && cps[k].cp === 0xE007F && FLAG_TAGS.indexOf(letters) !== -1) {
+          for (var t = i + 1; t <= k; t++) keep[cps[t].index] = true;
+        }
+      }
+    }
+    return keep;
+  }
+
   function hex(cp) { var s = cp.toString(16).toUpperCase(); while (s.length < 4) s = '0' + s; return 'U+' + s; }
   function nameOf(cp) { return NAMES[cp] || hex(cp); }
 
-  // scan(text) -> {findings:[{index,cp,hex,name,category}], counts:{cat:n}, total}
+  // scan(text) -> {findings:[{index,cp,hex,name,category}], counts:{cat:n}, total, emojiKept}
+  // emojiKept counts the joiners, selectors and tag characters left alone
+  // because they are part of an emoji.
   function scan(text) {
-    var findings = [], counts = {};
-    if (typeof text !== 'string') return { findings: findings, counts: counts, total: 0 };
+    var findings = [], counts = {}, emojiKept = 0;
+    if (typeof text !== 'string') return { findings: findings, counts: counts, total: 0, emojiKept: 0 };
+    var keep = emojiParts(text);
     for (var idx = 0; idx < text.length; ) {
       var cp = text.codePointAt(idx);
       var c = classify(cp);
-      if (c) {
+      if (c && keep[idx]) {
+        emojiKept++;
+      } else if (c) {
         findings.push({ index: idx, cp: cp, hex: hex(cp), name: nameOf(cp), category: c.category });
         counts[c.category] = (counts[c.category] || 0) + 1;
       }
       idx += cp > 0xFFFF ? 2 : 1;
     }
-    return { findings: findings, counts: counts, total: findings.length };
+    return { findings: findings, counts: counts, total: findings.length, emojiKept: emojiKept };
   }
 
   // clean(text) -> text with every flagged character removed (look-alike spaces -> a real space).
   function clean(text) {
     if (typeof text !== 'string') return '';
-    var out = '';
+    var out = '', keep = emojiParts(text);
     for (var idx = 0; idx < text.length; ) {
       var cp = text.codePointAt(idx);
       var c = classify(cp);
-      if (!c) out += String.fromCodePoint(cp);
+      if (!c || keep[idx]) out += String.fromCodePoint(cp);
       else if (c.action === 'space') out += ' ';
       idx += cp > 0xFFFF ? 2 : 1;
     }
@@ -122,11 +189,11 @@
   function cleanWith(text, skip) {
     if (!skip || !skip.length) return clean(text);
     if (typeof text !== 'string') return '';
-    var out = '';
+    var out = '', keep = emojiParts(text);
     for (var idx = 0; idx < text.length; ) {
       var cp = text.codePointAt(idx);
       var c = classify(cp);
-      if (!c) out += String.fromCodePoint(cp);
+      if (!c || keep[idx]) out += String.fromCodePoint(cp);
       else if (skip.indexOf(c.category) !== -1) out += String.fromCodePoint(cp);
       else if (c.action === 'space') out += ' ';
       idx += cp > 0xFFFF ? 2 : 1;
@@ -179,6 +246,7 @@
     visualize: visualize,
     normalizePunctuation: normalizePunctuation,
     classify: classify,
+    emojiParts: emojiParts,
     nameOf: nameOf,
     hex: hex,
     CATEGORIES: CATEGORIES,
