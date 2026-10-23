@@ -17,7 +17,9 @@ assert.ok(!panel.includes('=\\'), 'side-panel attributes must not use escaped ps
 assert.ok(!panel.includes('\\>'), 'side-panel tags must close normally');
 
 assert.deepStrictEqual(manifest.permissions, ['sidePanel']);
-assert.strictEqual(manifest.version, '1.3.0');
+// The engine's VERSION follows the extension release, so a bump has to touch both.
+assert.match(manifest.version, /^\d+\.\d+\.\d+$/);
+assert.strictEqual(require('./core.js').VERSION, manifest.version, 'core.js VERSION and manifest version differ');
 assert.ok(!manifest.host_permissions, 'the extension must not request host access');
 assert.strictEqual(manifest.side_panel.default_path, 'sidepanel.html');
 for (const iconPath of new Set([
