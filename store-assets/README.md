@@ -8,11 +8,7 @@ python scripts/package.py --check
 python tests/package.test.py
 ```
 
-Upload `dist/invisibles-1.3.0.zip` and compare its SHA-256 value with the checked checksum sidecar.
-
-Expected SHA-256:
-
-`8425e14dc433c76a0e7321c27339da0ce204d5fdffa77c6182f3f756174bce4e`
+Upload `dist/invisibles-<version>.zip` (the version in `extension/manifest.json`) and compare its SHA-256 value with the checked checksum sidecar. The builder prints the hash; any source change gives a new one.
 
 Use the copy in `listing.txt`, category `Tools`, and the public privacy URL:
 
