@@ -226,6 +226,67 @@
     return segments;
   }
 
+  // decodeHidden(text) -> [{kind, text, index, length}] for text carried by
+  // invisible characters. Two known ways to hide text in plain sight:
+  //   'tag'      - tag characters U+E0020..U+E007E mirror printable ASCII
+  //                ("ASCII smuggling", used to slip instructions past readers).
+  //   'selector' - variation selectors as bytes: U+FE00..U+FE0F are 0..15 and
+  //                U+E0100..U+E01EF are 16..255, read as UTF-8.
+  // index and length are in code units. Emoji parts are skipped. A selector run
+  // is reported only when it is two or more long and decodes to clean UTF-8,
+  // so a stray selector is not shown as a message.
+  function decodeHidden(text) {
+    var found = [];
+    if (typeof text !== 'string' || !text) return found;
+    var keep = emojiParts(text), cps = codePoints(text);
+    var MAX = 2000;
+
+    function selectorByte(cp) {
+      if (cp >= 0xFE00 && cp <= 0xFE0F) return cp - 0xFE00;
+      if (cp >= 0xE0100 && cp <= 0xE01EF) return cp - 0xE0100 + 16;
+      return -1;
+    }
+    function utf8(bytes) {
+      try {
+        var s = new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes));
+        return /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(s) ? null : s;
+      } catch (e) { return null; }
+    }
+
+    for (var i = 0; i < cps.length; ) {
+      var cp = cps[i].cp;
+      if (keep[cps[i].index]) { i++; continue; }
+
+      if (cp >= 0xE0020 && cp <= 0xE007E) {
+        var start = i, msg = '';
+        while (i < cps.length && cps[i].cp >= 0xE0020 && cps[i].cp <= 0xE007E && !keep[cps[i].index]) {
+          if (msg.length < MAX) msg += String.fromCharCode(cps[i].cp - 0xE0000);
+          i++;
+        }
+        if (i < cps.length && cps[i].cp === 0xE007F && !keep[cps[i].index]) i++; // cancel tag ends it
+        if (msg.trim()) found.push({ kind: 'tag', text: msg, index: cps[start].index, length: end(i) - cps[start].index });
+        continue;
+      }
+
+      if (selectorByte(cp) !== -1) {
+        var from = i, bytes = [];
+        while (i < cps.length && selectorByte(cps[i].cp) !== -1 && !keep[cps[i].index]) {
+          if (bytes.length < MAX * 4) bytes.push(selectorByte(cps[i].cp));
+          i++;
+        }
+        var decoded = bytes.length >= 2 ? utf8(bytes) : null;
+        if (decoded && decoded.trim()) {
+          found.push({ kind: 'selector', text: decoded.slice(0, MAX), index: cps[from].index, length: end(i) - cps[from].index });
+        }
+        continue;
+      }
+      i++;
+    }
+    return found;
+
+    function end(k) { return k < cps.length ? cps[k].index : text.length; }
+  }
+
   // normalizePunctuation(text) -> opt-in: fancy typography down to plain ASCII.
   // Separate from clean() because these characters are visible and often wanted.
   function normalizePunctuation(text) {
@@ -247,6 +308,7 @@
     normalizePunctuation: normalizePunctuation,
     classify: classify,
     emojiParts: emojiParts,
+    decodeHidden: decodeHidden,
     nameOf: nameOf,
     hex: hex,
     CATEGORIES: CATEGORIES,

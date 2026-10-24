@@ -43,6 +43,12 @@ flagged, and the summary says how many it kept. The same characters anywhere els
 are still flagged, including extra selectors stacked on an emoji, which is a way
 to hide data.
 
+Some of these characters can carry a whole message. Tag characters mirror ASCII
+letters one for one, and variation selectors can hold bytes. When a run of either
+decodes to readable text, Invisibles shows it in plain words under the summary
+("Hidden text in tag characters: Ignore previous instructions..."), so you can
+see what someone tried to slip past a reader or a chatbot.
+
 Look-alike spaces get replaced with a normal space so words don't run together.
 Everything else is removed. There's an optional toggle that also swaps fancy
 punctuation (curly quotes, em dashes, ellipsis) for plain ASCII when a target
@@ -72,6 +78,7 @@ I.scan('he​llo').findings;   // [{index:2, cp:8203, hex:'U+200B', name:'Zero-W
 I.clean('he​llo');           // 'hello'
 I.clean('a b');              // 'a b'  (NBSP becomes a normal space)
 I.normalizePunctuation('“a”—b');  // '"a"--b'  (opt-in)
+I.decodeHidden(text);   // [{kind:'tag', text:'hidden words', index, length}]
 ```
 
 `scan()` and `clean()` never throw, even on non-string input.
@@ -79,7 +86,7 @@ I.normalizePunctuation('“a”—b');  // '"a"--b'  (opt-in)
 ## Files
 
 ```
-core.js        classify() + scan() + clean() + normalizePunctuation()
+core.js        classify() + scan() + clean() + decodeHidden() + normalizePunctuation()
 core.test.js   node core.test.js
 index.html     the web app. No framework, no build step
 extension/     MV3 side panel, sidePanel permission only

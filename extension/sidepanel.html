@@ -70,6 +70,10 @@ font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:p
 .mark{background:var(--hit-soft);color:var(--hit);border-radius:4px;padding:0 3px;
 cursor:help;border-bottom:2px dotted var(--hit)}
 .mark.zero-width{border-bottom-style:solid}
+.hidden-msg{flex:none;border:1px solid var(--hit);background:var(--hit-soft);border-radius:var(--r-md);
+padding:8px 12px;font-size:12.5px}
+.hidden-msg p{margin:0}.hidden-msg p+p{margin-top:4px}
+.hidden-msg q{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);word-break:break-word}
  #out{background:var(--raised);flex:1;min-height:100px}
 .hint{font-size:12px;color:var(--muted);flex:none}
 .dropzone{flex:none;text-align:center;font-size:12px;color:var(--muted);
@@ -106,6 +110,7 @@ border:1px dashed var(--line);border-radius:var(--r-md);padding:7px;cursor:point
 
  <div id="summary" role="status" aria-live="polite"></div>
  <div id="chips"></div>
+ <div id="hidden-msg" class="hidden-msg" role="note" hidden></div>
  <div id="preview" aria-label="Where the hidden characters sit in your text"></div>
 
  <label class="sr-only" for="out">Clean text</label>
