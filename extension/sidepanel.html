@@ -78,7 +78,17 @@ padding:8px 12px;font-size:12.5px}
 .hint{font-size:12px;color:var(--muted);flex:none}
 .dropzone{flex:none;text-align:center;font-size:12px;color:var(--muted);
 border:1px dashed var(--line);border-radius:var(--r-md);padding:7px;cursor:pointer}
-.dropzone.over{border-color:var(--clay);color:var(--clay)}
+ .dropzone.over{border-color:var(--clay);color:var(--clay)}
+ .dropzone:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+ .firstrun{flex:none;border:1px solid var(--line);background:var(--raised);border-radius:var(--r-md);
+ padding:10px 12px;font-size:12.5px;display:flex;gap:var(--s2);align-items:flex-start;justify-content:space-between}
+ .firstrun p{margin:0;flex:1;line-height:1.45;color:var(--muted)}
+ .firstrun kbd{font:11px/1.2 ui-monospace,Menlo,Consolas,monospace;padding:1px 5px;border-radius:4px;
+ border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+ .firstrun button{flex:none;min-height:32px;padding:6px 12px;font-size:12px}
+ .kbd-hint{font-size:12px;color:var(--muted)}
+ .kbd-hint kbd{font:11px/1.2 ui-monospace,Menlo,Consolas,monospace;padding:1px 5px;border-radius:4px;
+ border:1px solid var(--line);background:var(--panel)}
 
  .footer{flex:none;margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s3)}
  .links{display:flex;gap:var(--s2)}
@@ -97,19 +107,26 @@ border:1px dashed var(--line);border-radius:var(--r-md);padding:7px;cursor:point
  <p class="sub">Processed locally: pasted text stays in this panel and is never stored or uploaded.</p>
  </div>
 
+ <div id="firstrun" class="firstrun" role="note">
+ <p>Paste text here (or drop a file). Hidden characters show in the preview below. Tap a category chip to leave that type in place. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>⌘</kbd>+<kbd>Enter</kbd> runs Clean it.</p>
+ <button type="button" id="dismiss-hint">Got it</button>
+ </div>
+
  <div class="content">
  <label class="sr-only" for="in">Text to inspect</label>
- <textarea id="in" placeholder="Paste text here to inspect..." spellcheck="false" autocomplete="off"></textarea>
+ <textarea id="in" placeholder="Paste text here to inspect..." spellcheck="false" autocomplete="off" aria-describedby="scan-hint"></textarea>
+ <p class="hint" id="scan-hint">Nothing you paste is stored or sent anywhere unless you choose Report a miss (metadata only).</p>
 
  <div class="row">
- <button id="clean" class="primary" type="button" disabled>Clean it</button>
+ <button id="clean" class="primary" type="button" disabled aria-keyshortcuts="Control+Enter Meta+Enter">Clean it</button>
  <button id="copy" type="button" hidden>Copy clean text</button>
+ <span class="kbd-hint" aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
  </div>
 
  <label class="opt"><input type="checkbox" id="norm"> normalize smart quotes / em dashes</label>
 
  <div id="summary" role="status" aria-live="polite"></div>
- <div id="chips"></div>
+ <div id="chips" role="group" aria-label="Hidden character categories. Toggle to skip a category when cleaning."></div>
  <div id="hidden-msg" class="hidden-msg" role="note" hidden></div>
  <div id="preview" aria-label="Where the hidden characters sit in your text"></div>
 
@@ -117,7 +134,7 @@ border:1px dashed var(--line);border-radius:var(--r-md);padding:7px;cursor:point
  <textarea id="out" readonly spellcheck="false" hidden></textarea>
  <div class="hint" id="delta" aria-live="polite"></div>
  </div>
- <div class="dropzone" id="drop" title="Load a text file">...or drop a .txt / .md / .csv file here</div>
+ <div class="dropzone" id="drop" role="button" tabindex="0" aria-label="Load a text file. Accepts .txt, .md, .csv, .json, and .log.">...or drop a .txt / .md / .csv file here (click to browse)</div>
 
  <div class="footer">
  <div class="links">

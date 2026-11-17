@@ -11,7 +11,7 @@ Privacy and access
 - No host access: the extension cannot read the pages you visit.
 - No account, analytics, advertising, or remote service.
 - Pasted text stays in the side panel, is processed only in memory, and is never stored or transmitted.
-- The only requested permission is sidePanel, used to open the tool beside the current tab.
+- Permissions: sidePanel (open the tool beside the current tab) and storage (remember your UI preferences — not your pasted text).
 
 Invisibles identifies characters, not authorship or intent. Some hidden characters are legitimate, so review the findings before cleaning.
 

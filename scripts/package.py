@@ -42,8 +42,12 @@ def validate_manifest(files: list[Path]) -> dict[str, object]:
     manifest = json.loads((SOURCE / "manifest.json").read_text(encoding="utf-8"))
     if manifest.get("manifest_version") != 3:
         raise SystemExit("manifest_version must be 3")
-    if manifest.get("permissions") != ["sidePanel"]:
-        raise SystemExit("Invisibles must request only the sidePanel permission")
+    allowed = {"sidePanel", "storage"}
+    permissions = manifest.get("permissions") or []
+    if set(permissions) - allowed or "sidePanel" not in permissions:
+        raise SystemExit("Invisibles may request only sidePanel and storage permissions")
+    if permissions != sorted(permissions, key=lambda p: (p != "sidePanel", p)):
+        raise SystemExit("manifest permissions must list sidePanel first, then storage")
     for broad_access in ("host_permissions", "content_scripts", "optional_permissions"):
         if manifest.get(broad_access):
             raise SystemExit(f"unexpected manifest access: {broad_access}")

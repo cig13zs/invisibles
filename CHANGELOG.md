@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.1 (2026-11-17)
+
+- Extension: explicit strict `content_security_policy` on extension pages; summary and category
+  chips render with the DOM instead of `innerHTML` (preview marks still escape dynamic titles).
+- Settings persist via `chrome.storage.sync`: punctuation-normalize toggle and first-run hint dismissal.
+  The `storage` permission is the only addition — still no host access.
+- Side panel: first-run tips, empty-state scan message, keyboard/file-drop accessibility, 5 MB file
+  guard with read errors surfaced, and preview skipped past 20k characters (same cap as the web app).
+
 ## 1.4.0 (2026-10-23)
 
 - Hidden text shown in plain words. Text smuggled in tag characters (ASCII smuggling) or

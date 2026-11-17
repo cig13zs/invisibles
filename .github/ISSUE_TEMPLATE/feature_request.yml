@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest an improvement (keep scope small)
+title: "[feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What pain are you solving? Avoid asking for analytics, cloud sync of text, or host-wide page scanning unless you have a strong privacy case.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Constraints
+      options:
+        - label: I am OK with this staying fully offline / local-only
+          required: true

@@ -312,6 +312,6 @@
     nameOf: nameOf,
     hex: hex,
     CATEGORIES: CATEGORIES,
-    VERSION: '1.4.0'
+    VERSION: '1.4.1'
   };
 });

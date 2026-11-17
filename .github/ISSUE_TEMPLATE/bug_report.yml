@@ -1,0 +1,46 @@
+name: Bug report
+description: Something broke or behaves wrong
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste sensitive text.** Describe the problem in general terms.
+        For missed/wrong Unicode detections, use **Report a miss** in the extension instead (metadata only).
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: e.g. extension 1.4.1 or web app on main
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where
+      options:
+        - Chrome extension (side panel)
+        - Web app
+        - core.js library
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: What you did, without pasting private content
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true

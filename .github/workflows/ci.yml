@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 24
+
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.13"
+
+      - name: Unit and integration tests
+        run: |
+          node core.test.js
+          node site.test.js
+          node extension.test.js
+          node store-assets.test.js
+          python3 tests/package.test.py
+
+      - name: Lint (JavaScript syntax)
+        run: find . -path ./.git -prune -o -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Build Chrome Web Store package
+        run: python3 scripts/package.py
+
+      - name: Install Playwright
+        run: |
+          npm ci
+          npx playwright install chromium
+
+      - name: Extension UI E2E smoke
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@ea16584ca1a77a5c099c5c0e0dd0dd5e71b8b2f6 # v4.6.2
+        if: always()
+        with:
+          name: e2e-screenshots
+          path: artifacts/e2e/*.png
+          if-no-files-found: ignore

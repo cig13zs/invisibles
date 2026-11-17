@@ -16,7 +16,9 @@ assert.match(panel, /href="https:\/\/cig13zs\.github\.io\/invisibles\/privacy\.h
 assert.ok(!panel.includes('=\\'), 'side-panel attributes must not use escaped pseudo-quotes');
 assert.ok(!panel.includes('\\>'), 'side-panel tags must close normally');
 
-assert.deepStrictEqual(manifest.permissions, ['sidePanel']);
+assert.deepStrictEqual(manifest.permissions, ['sidePanel', 'storage']);
+assert.ok(manifest.content_security_policy && manifest.content_security_policy.extension_pages,
+  'manifest must declare extension_pages CSP');
 // The engine's VERSION follows the extension release, so a bump has to touch both.
 assert.match(manifest.version, /^\d+\.\d+\.\d+$/);
 assert.strictEqual(require('./core.js').VERSION, manifest.version, 'core.js VERSION and manifest version differ');
