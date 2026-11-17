@@ -1,122 +1,106 @@
 # Invisibles
 
-Paste text, see every hidden character in it with its name and code point, then
-click once to strip them. Zero-width spaces, non-breaking spaces that look like
-real ones, direction controls, and the odd characters that ride along when text
-moves between editors, documents, chat apps, and websites.
+**Find hidden Unicode in pasted text, see what it is, and strip it — entirely on your device.**
 
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-buy_me_a_coffee-FF5E5B?style=flat-square&logo=ko-fi&logoColor=white)](https://ko-fi.com/jju1s)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-install-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ehfmbdppopedenilpgmhofcdibkilmbe)
+[![Tests](https://img.shields.io/github/actions/workflow/status/cig13zs/invisibles/ci.yml?style=flat-square&label=CI)](https://github.com/cig13zs/invisibles/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/github/actions/workflow/status/cig13zs/invisibles/test.yml?style=flat-square&label=tests)](https://github.com/cig13zs/invisibles/actions)
 
-Web app: **[cig13zs.github.io/invisibles](https://cig13zs.github.io/invisibles/)**.
-Or install the [browser extension](#browser-extension) so it's one click from
-any tab, offline.
+Install **[Invisibles from the Chrome Web Store](https://chromewebstore.google.com/detail/ehfmbdppopedenilpgmhofcdibkilmbe)** (Chrome, Edge, Brave, Opera), or use the **[web app](https://cig13zs.github.io/invisibles/)** — same engine, no install.
 
-A single invisible character can break CSV and JSON imports, stop strings from
-matching, or throw off code search. Most editors do not draw these characters,
-so the problem often appears somewhere downstream.
+Zero-width spaces, non-breaking spaces that look like real ones, bidi controls, tag characters, and other invisible code points can break CSV imports, string comparison, and search. Most editors never show them. Invisibles names each hit, highlights where it sits, decodes smuggled “hidden text,” and cleans with one click — offline, with no account and no analytics.
 
-Paste tools are not always clear about how they handle input. This repository is
-deliberately auditable: it has no server, analytics, or remote processing. The
-web app is one HTML page and one small script, and it works offline.
+## Features
 
-There are two builds sharing one engine (`core.js`): the web app and a side-panel
-extension. The extension requests only Chrome's `sidePanel` permission and no
-host access, so it cannot read the pages you visit.
+- **Scan & preview** — category counts, inline marks for where hidden characters sit, decoded messages from tag characters and variation selectors
+- **Clean** — remove or replace flagged characters; look-alike spaces become normal spaces; per-category chips to skip a type
+- **Emoji-safe** — joiners and selectors that belong to real emoji are kept; the summary says how many were preserved
+- **Optional punctuation normalize** — smart quotes, em dashes, and ellipsis → plain ASCII (off by default)
+- **File drop** — `.txt`, `.md`, `.csv`, `.json`, `.log` (up to 5 MB) in the extension side panel
+- **Web app + library** — single `core.js` with no dependencies (`scan`, `clean`, `decodeHidden`, …)
 
-## What it looks for
+## Screenshots
 
-| Category | Examples | Why it matters |
+| Empty | Hidden characters | Dark |
 |---|---|---|
-| Zero-width | ZWSP `U+200B`, ZWJ `U+200D`, word joiner, BOM `U+FEFF` | Invisible; break search, passwords, code |
-| Look-alike spaces | NBSP `U+00A0`, narrow NBSP `U+202F`, ideographic space | Look like a space, aren't one |
-| Bidi controls | RLO `U+202E`, isolates `U+2066`..`U+2069` | Can reorder or hide text (Trojan Source) |
-| Soft hyphen | `U+00AD` | Invisible unless the line wraps |
-| Tag characters | `U+E0000`..`U+E007F` | Invisible; smuggle hidden text or prompts |
-| Variation selectors | `U+FE00`..`U+FE0F` | Invisible; can carry hidden data |
-| Control chars | C0/C1, line and paragraph separators | Non-printing; break parsers |
+| ![Empty side panel](docs/screenshots/sidepanel-empty.png) | ![Scan](docs/screenshots/sidepanel-with-hidden.png) | ![Dark scan](docs/screenshots/sidepanel-dark.png) |
 
-Emoji are left whole. A zero-width joiner, variation selector or tag letter that is
-part of an emoji (👨‍👩‍👧, ❤️, a rainbow flag, a keycap, the England flag) is not
-flagged, and the summary says how many it kept. The same characters anywhere else
-are still flagged, including extra selectors stacked on an emoji, which is a way
-to hide data.
+Store listing assets (fixed sizes for submission) live in [`store-assets/`](store-assets/).
 
-Some of these characters can carry a whole message. Tag characters mirror ASCII
-letters one for one, and variation selectors can hold bytes. When a run of either
-decodes to readable text, Invisibles shows it in plain words under the summary
-("Hidden text in tag characters: Ignore previous instructions..."), so you can
-see what someone tried to slip past a reader or a chatbot.
+## Permissions (extension)
 
-Look-alike spaces get replaced with a normal space so words don't run together.
-Everything else is removed. There's an optional toggle that also swaps fancy
-punctuation (curly quotes, em dashes, ellipsis) for plain ASCII when a target
-system does not handle typographic characters reliably.
+| Permission | Why |
+|---|---|
+| `sidePanel` | Opens Invisibles in Chrome’s side panel when you click the toolbar icon. |
+| `storage` | Saves your punctuation-normalize toggle and whether you dismissed the first-run hint (via `chrome.storage.sync` with your Chrome profile — not your pasted text). |
 
-## Browser extension
+**Not requested:** `host_permissions`, `tabs`, `scripting`, `clipboardRead`, or any broad site access. The extension cannot read pages you visit. Pasted text is processed in memory only and is not uploaded unless you explicitly use **Report a miss**, which sends metadata (code points and counts) — never your input text.
 
-Opens directly as a Chrome Side Panel. Click the toolbar icon, and it docks cleanly on the side of your browser without floating in front of your page content. Paste, clean, copy. The panel states before input that pasted text stays in the panel and is never stored or uploaded. It declares no remote permissions and no host access, so it cannot read any page you visit, and it works completely offline.
+See [privacy.html](privacy.html) and [SECURITY.md](SECURITY.md).
 
-Load it unpacked in Chrome, Edge, Brave or Opera:
+## Privacy
 
-1. Download the latest zip from [Releases](https://github.com/cig13zs/invisibles/releases) and unzip it.
-2. Open `chrome://extensions` and turn on Developer mode.
-3. Click Load unpacked and pick the `extension` folder.
-4. Click the Invisibles icon to open the sidebar and paste your text.
+- No server-side text processing for the web app or extension UI
+- No analytics, ads, or remote code execution
+- No storage of pasted content (only the two UI preferences above)
+- Open source — audit `core.js`, `extension/popup.js`, and `extension/manifest.json`
 
-## Use it as a library
+## Development
 
-`core.js` has no dependencies and runs in the browser (`window.Invisibles`) or
-in Node (`require`).
+**Requirements:** Node.js 24+, Python 3.13+ (for the deterministic store zip builder).
+
+```bash
+# Logic & manifest checks
+node core.test.js
+node site.test.js
+node extension.test.js
+node store-assets.test.js
+
+# Deterministic Chrome Web Store zip (+ sha256)
+python3 tests/package.test.py
+python3 scripts/package.py          # writes dist/invisibles-<version>.zip
+
+# JavaScript syntax (all .js files)
+find . -path ./.git -prune -o -name '*.js' -print0 | xargs -0 -n1 node --check
+
+# Extension smoke test (Playwright + Chrome)
+npm ci
+npx playwright install chromium
+npm run test:e2e                    # screenshots → docs/screenshots/
+```
+
+**Load unpacked:** `chrome://extensions` → Developer mode → Load unpacked → choose the `extension/` folder.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md). Current extension version: **1.4.1**.
+
+## Use as a library
 
 ```js
 const I = require('./core.js');
-
-I.scan('he​llo').total;      // 1
-I.scan('he​llo').findings;   // [{index:2, cp:8203, hex:'U+200B', name:'Zero-Width Space', category:'zero-width'}]
-I.clean('he​llo');           // 'hello'
-I.clean('a b');              // 'a b'  (NBSP becomes a normal space)
-I.normalizePunctuation('“a”—b');  // '"a"--b'  (opt-in)
-I.decodeHidden(text);   // [{kind:'tag', text:'hidden words', index, length}]
+I.scan('he\u200Bllo').total;           // 1
+I.clean('he\u200Bllo');                // 'hello'
+I.decodeHidden(tagSmuggledText);       // hidden ASCII in tags / selectors
 ```
 
-`scan()` and `clean()` never throw, even on non-string input.
+`scan()` and `clean()` never throw on bad input.
 
-## Files
+## Repository layout
 
 ```
-core.js        classify() + scan() + clean() + decodeHidden() + normalizePunctuation()
-core.test.js   node core.test.js
-index.html     the web app. No framework, no build step
-extension/     MV3 side panel, sidePanel permission only
-scripts/       deterministic Chrome Web Store package builder
-store-assets/  listing copy, reproducible screenshots, and submission notes
-tools/         deterministic icon generator
+core.js              Shared engine (web + extension + Node)
+index.html           Web app (static, offline-capable)
+extension/           Manifest V3 side panel build
+scripts/package.py   Reproducible store zip
+tests/               Package tests + Playwright e2e
+store-assets/        Listing copy and submission screenshots
 ```
 
-```bash
-node core.test.js
-node site.test.js
-python tests/package.test.py
-node store-assets.test.js
-```
+## More tools by [cig13zs](https://github.com/cig13zs)
 
-## Limits
-
-It flags characters, not intent. A non-breaking space is sometimes deliberate,
-so the reveal view shows you exactly what and where before you strip anything.
-
-The punctuation normalize is opt-in and lossy, since em dashes become `--`. It's
-off by default.
-
-It can't tell you whether text was written by an AI. It only shows the
-characters that are actually there.
-
-## More tools
-
-- [Toolfold](https://github.com/cig13zs/toolfold), selected local developer utilities in one PWA
-- [Plusminus](https://github.com/cig13zs/plusminus), measurement uncertainty budgets from instrument specifications
-- [Rinse](https://github.com/cig13zs/rinse), inspect and remove location metadata from a photo
+- [Toolfold](https://github.com/cig13zs/toolfold) — local developer utilities in one PWA  
+- [Plusminus](https://github.com/cig13zs/plusminus) — measurement uncertainty budgets from instrument specs  
+- [Rinse](https://github.com/cig13zs/rinse) — inspect and remove location metadata from photos  
 
 MIT licensed. [Ko-fi](https://ko-fi.com/jju1s) if it saved you a headache.

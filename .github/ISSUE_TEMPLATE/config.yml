@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/cig13zs/invisibles/security/advisories/new
+    about: Report security issues privately (not public issues)
+  - name: Missed or wrongly flagged character
+    url: https://github.com/cig13zs/invisibles/issues/new?title=Missed+or+wrongly+flagged+character&body=Use+the+extension%27s+Report+a+miss+link+to+pre-fill+metadata-only+details.
+    about: Prefer the in-extension report for detection bugs

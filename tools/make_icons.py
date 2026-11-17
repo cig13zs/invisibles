@@ -16,20 +16,19 @@ def make_artwork() -> Image.Image:
     image = Image.new("RGBA", (ARTWORK_SIZE, ARTWORK_SIZE), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image, "RGBA")
 
-    draw.rounded_rectangle((18, 18, 494, 494), radius=112, fill=(21, 73, 72, 255))
-    draw.ellipse((304, -48, 584, 232), fill=(63, 143, 132, 78))
-    draw.ellipse((-82, 334, 178, 594), fill=(241, 127, 82, 44))
-    draw.rounded_rectangle((18, 18, 494, 494), radius=112, outline=(255, 255, 255, 58), width=6)
-
-    eye = [(94, 258), (139, 195), (207, 159), (256, 153), (305, 159), (373, 195), (418, 258),
-           (373, 321), (305, 357), (256, 363), (207, 357), (139, 321)]
-    draw.polygon(eye, fill=(249, 247, 239, 245))
-    draw.ellipse((194, 196, 318, 320), fill=(241, 127, 82, 255))
-    draw.ellipse((224, 226, 288, 290), fill=(20, 61, 61, 255))
-    draw.ellipse((243, 238, 264, 259), fill=(255, 255, 255, 225))
-
-    for x, y, radius in ((116, 130, 12), (156, 105, 8), (198, 91, 6), (396, 386, 12), (358, 411, 8)):
-        draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=(241, 127, 82, 225))
+    ink = (28, 22, 18, 255)
+    copper = (196, 83, 42, 255)
+    paper = (255, 253, 248, 255)
+    draw.rounded_rectangle((0, 0, 511, 511), radius=116, fill=ink)
+    draw.rounded_rectangle((28, 28, 484, 484), radius=96, outline=(232, 148, 106, 110), width=10)
+    eye = [(88, 256), (140, 182), (210, 148), (256, 142), (302, 148), (372, 182), (424, 256),
+           (372, 336), (302, 370), (256, 376), (210, 370), (140, 336)]
+    draw.polygon(eye, fill=paper)
+    draw.ellipse((188, 194, 324, 330), fill=copper)
+    draw.ellipse((226, 232, 286, 292), fill=ink)
+    draw.ellipse((246, 240, 268, 262), fill=(255, 253, 248, 230))
+    # A small reveal mark, the same rectangle the panel uses for hidden characters.
+    draw.rounded_rectangle((236, 392, 276, 408), radius=4, fill=copper)
 
     return image
 

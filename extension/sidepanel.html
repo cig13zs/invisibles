@@ -5,111 +5,38 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Find and remove hidden Unicode characters locally in your browser.">
 <title>Invisibles Sidebar</title>
-<style>
- :root{
- --bg:#faf9f6; --panel:#fff; --raised:#f3f1ec;
- --ink:#1c1a17; --muted:#6b665d; --line:#e4e0d8;
- --clay:#b4522f; --clay-soft:#f7ece7; --clay-ink:#fdfcfa;
- --ok:#1f7a4d; --hit:#b3372c; --hit-soft:#f9eae8;
- --r-sm:8px; --r-md:11px; --r-lg:14px; --r-pill:999px;
- --s1:6px; --s2:10px; --s3:14px; --s4:20px; --s5:28px;
- }
- @media (prefers-color-scheme:dark){:root{
- --bg:#14130f; --panel:#1c1a16; --raised:#221f1a;
- --ink:#f0ede5; --muted:#a09a8d; --line:#2e2a24;
- --clay:#e0865e; --clay-soft:#2a1c15; --clay-ink:#14130f;
- --ok:#54c489; --hit:#ef7f70; --hit-soft:#2c1815;
- }}
- *{box-sizing:border-box}
- html,body{height:100%;margin:0;padding:0}
- body{display:flex;flex-direction:column;padding:var(--s4);
- background:var(--bg);color:var(--ink);
- font:14px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
- -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
-
- .header{flex:none;margin-bottom:var(--s3)}
- h1{font-size:18px;margin:0;font-weight:660;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
- h1 .badge{font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--r-pill);background:var(--clay-soft);color:var(--clay)}
- .sub{color:var(--muted);font-size:12.5px;margin:4px 0 0;line-height:1.4}
-
- .content{flex:1;display:flex;flex-direction:column;gap:var(--s2);overflow-y:auto}
- textarea{width:100%;min-height:120px;flex:1;resize:vertical;border:1px solid var(--line);
- border-radius:var(--r-md);background:var(--panel);color:var(--ink);padding:12px;
- font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
- textarea::placeholder{color:var(--muted);opacity:.75}
- textarea:focus{outline:2px solid var(--clay);outline-offset:1px;border-color:var(--clay)}
- a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
- .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-
- .row{display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;flex:none}
- button{min-height:38px;padding:9px 16px;border-radius:var(--r-sm);font-weight:620;font-size:13px;
- border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;
- transition:background .15s ease,border-color .15s ease}
- button:hover{border-color:var(--muted)}
- button.primary{background:var(--clay);color:var(--clay-ink);border-color:var(--clay)}
- button.primary:hover{background:var(--ink);border-color:var(--ink)}
- button:disabled{opacity:.42;cursor:default}
- button:disabled:hover{border-color:var(--line);background:var(--panel)}
-
- label.opt{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);
- cursor:pointer;flex:none}
- label.opt input{accent-color:var(--clay);width:15px;height:15px;flex:none}
-
- #summary{font-size:13px;flex:none}
- .verdict{font-weight:680}
- .verdict.clean{color:var(--ok)}.verdict.dirty{color:var(--clay)}
-#chips{display:flex;gap:var(--s1);flex-wrap:wrap;flex:none}
-button.chip{min-height:0;padding:3px 10px;font-size:11.5px;font-weight:400;
-border-radius:var(--r-pill);color:var(--muted);background:var(--panel);
-border:1px solid var(--line);text-transform:none}
-button.chip b{color:var(--ink);font-weight:640}
-button.chip[aria-pressed="false"]{opacity:.45;text-decoration:line-through}
-#preview{display:none;flex:none;max-height:150px;overflow-y:auto;border:1px solid var(--line);
-border-radius:var(--r-md);background:var(--panel);padding:9px 12px;
-font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
-.mark{background:var(--hit-soft);color:var(--hit);border-radius:4px;padding:0 3px;
-cursor:help;border-bottom:2px dotted var(--hit)}
-.mark.zero-width{border-bottom-style:solid}
-.hidden-msg{flex:none;border:1px solid var(--hit);background:var(--hit-soft);border-radius:var(--r-md);
-padding:8px 12px;font-size:12.5px}
-.hidden-msg p{margin:0}.hidden-msg p+p{margin-top:4px}
-.hidden-msg q{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);word-break:break-word}
- #out{background:var(--raised);flex:1;min-height:100px}
-.hint{font-size:12px;color:var(--muted);flex:none}
-.dropzone{flex:none;text-align:center;font-size:12px;color:var(--muted);
-border:1px dashed var(--line);border-radius:var(--r-md);padding:7px;cursor:pointer}
-.dropzone.over{border-color:var(--clay);color:var(--clay)}
-
- .footer{flex:none;margin-top:var(--s3);border-top:1px solid var(--line);padding-top:var(--s3)}
- .links{display:flex;gap:var(--s2)}
- .links a{flex:1;text-align:center;text-decoration:none;font-weight:620;font-size:12px;
- padding:8px;border-radius:var(--r-sm);min-height:36px;display:flex;align-items:center;justify-content:center}
- .kofi{background:var(--clay-soft);color:var(--clay);border:1px solid var(--clay)}
- .kofi:hover{background:var(--clay);color:var(--clay-ink)}
- .gh,.privacy{background:var(--raised);color:var(--ink);border:1px solid var(--line)}
- .gh:hover,.privacy:hover{border-color:var(--muted)}
- @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
-</style>
+<link rel="stylesheet" href="theme.css">
 </head>
 <body>
  <div class="header">
- <h1>Invisibles <span class="badge">Sidebar</span></h1>
+ <h1><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32" width="18" height="18" fill="none"><path d="M2 16s5.5-8 14-8 14 8 14 8-5.5 8-14 8S2 16 2 16Z" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="16" r="4.5" fill="currentColor"/><circle cx="17.4" cy="14.6" r="1.3" fill="#fffdf8"/></svg></span> Invisibles <span class="badge">Local</span></h1>
  <p class="sub">Processed locally: pasted text stays in this panel and is never stored or uploaded.</p>
+ </div>
+
+ <div id="firstrun" class="firstrun" role="note">
+ <p>Paste text here (or drop a file). Hidden characters show in the preview below. Tap a category chip to leave that type in place. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>⌘</kbd>+<kbd>Enter</kbd> runs Clean it.</p>
+ <button type="button" id="dismiss-hint">Got it</button>
  </div>
 
  <div class="content">
  <label class="sr-only" for="in">Text to inspect</label>
- <textarea id="in" placeholder="Paste text here to inspect..." spellcheck="false" autocomplete="off"></textarea>
+ <textarea id="in" placeholder="Paste text here to inspect..." spellcheck="false" autocomplete="off" aria-describedby="scan-hint"></textarea>
+ <p class="hint" id="scan-hint">Nothing you paste is stored or sent anywhere unless you choose Report a miss (metadata only).</p>
 
  <div class="row">
- <button id="clean" class="primary" type="button" disabled>Clean it</button>
+ <button id="clean" class="primary" type="button" disabled aria-keyshortcuts="Control+Enter Meta+Enter">Clean it</button>
  <button id="copy" type="button" hidden>Copy clean text</button>
+ <span class="kbd-hint" aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
  </div>
 
- <label class="opt"><input type="checkbox" id="norm"> normalize smart quotes / em dashes</label>
+ <label class="opt"><input type="checkbox" id="norm"><span class="switch-ui" aria-hidden="true"></span> Also normalize smart quotes and em dashes</label>
 
- <div id="summary" role="status" aria-live="polite"></div>
- <div id="chips"></div>
+ <div id="empty" class="empty">
+  <div class="empty-glyph" aria-hidden="true">&#x25AC;</div>
+  <div><strong>Nothing to reveal yet</strong><p>Paste text or drop a file. Hidden characters show up here as marks you can hover.</p></div>
+ </div>
+ <div id="summary" role="status" aria-live="polite" hidden></div>
+ <div id="chips" role="group" aria-label="Hidden character categories. Toggle to skip a category when cleaning."></div>
  <div id="hidden-msg" class="hidden-msg" role="note" hidden></div>
  <div id="preview" aria-label="Where the hidden characters sit in your text"></div>
 
@@ -117,7 +44,7 @@ border:1px dashed var(--line);border-radius:var(--r-md);padding:7px;cursor:point
  <textarea id="out" readonly spellcheck="false" hidden></textarea>
  <div class="hint" id="delta" aria-live="polite"></div>
  </div>
- <div class="dropzone" id="drop" title="Load a text file">...or drop a .txt / .md / .csv file here</div>
+ <div class="dropzone" id="drop" role="button" tabindex="0" aria-label="Load a text file. Accepts .txt, .md, .csv, .json, and .log.">...or drop a .txt / .md / .csv file here (click to browse)</div>
 
  <div class="footer">
  <div class="links">
