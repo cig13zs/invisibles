@@ -1,5 +1,12 @@
 # Screenshots
 
-`sidepanel-with-hidden.png` and `sidepanel-after-clean.png` are produced by `npm run test:e2e` (Playwright loads the unpacked extension in Chrome).
+Produced by `npm run test:e2e` (Playwright, light and dark):
 
-`sidepanel-before-1.4.0.png` is the prior store-style capture from `store-assets/` for comparison in release PRs.
+- `sidepanel-empty.png`
+- `sidepanel-with-hidden.png`
+- `sidepanel-after-clean.png`
+- `sidepanel-dark.png`
+
+`before-design-scan.png` and `before-design-clean.png` are the panel before the 1.4.1 visual pass.
+
+Chrome Web Store images live in `store-assets/` and are rebuilt with `node store-assets/capture.js`.

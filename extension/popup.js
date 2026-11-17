@@ -8,7 +8,8 @@
       preview=document.getElementById('preview'),drop=document.getElementById('drop'),
       reportBtn=document.getElementById('report'),reportMsg=document.getElementById('reportmsg'),
       hiddenMsg=document.getElementById('hidden-msg'),
-      firstrun=document.getElementById('firstrun'),dismissHint=document.getElementById('dismiss-hint');
+      firstrun=document.getElementById('firstrun'),dismissHint=document.getElementById('dismiss-hint'),
+      empty=document.getElementById('empty');
 
   var REVEAL_LIMIT=20000;
   var FILE_MAX_BYTES=5*1024*1024;
@@ -94,7 +95,7 @@
     cats.forEach(function(c){
       var btn=document.createElement('button');
       btn.type='button';
-      btn.className='chip';
+      btn.className='chip cat-'+c;
       btn.setAttribute('data-cat',c);
       btn.setAttribute('aria-pressed',skipped.indexOf(c)===-1?'true':'false');
       btn.title=I.CATEGORIES[c]||c;
@@ -112,11 +113,15 @@
     cleanBtn.disabled=!text||(r.total===0&&!norm.checked);
     if(!text){
       setSummary('','','','');
+      if(empty) empty.hidden=false;
+      summary.hidden=true;
       chips.replaceChildren();
       preview.replaceChildren();
       preview.style.display='none';
       return;
     }
+    if(empty) empty.hidden=true;
+    summary.hidden=false;
     if(r.total===0){
       setSummary(text,'clean','Clean.',' No hidden characters.'+(norm.checked?' Punctuation will still be normalized.':''));
       chips.replaceChildren();
@@ -144,7 +149,7 @@
     var segs=I.visualize(text),html='';
     for(var i=0;i<segs.length;i++){
       if(segs[i].hidden){
-        html+='<mark class="mark '+(segs[i].category==='zero-width'?'zero-width':'')+
+        html+='<mark class="mark cat-'+segs[i].category+
           '" title="'+esc(segs[i].label)+' ('+esc(segs[i].hex)+')">&#x25AC;</mark>';
       }else{
         html+=esc(segs[i].text);

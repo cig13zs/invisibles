@@ -65,6 +65,7 @@ function serve(request, response) {
         throw new Error('side-panel script tags changed');
       }
       panel = panel
+        .replace('href="theme.css"', 'href="/extension/theme.css"')
         .replace(coreTag, '<script src="/extension/core.js"></script>')
         .replace(
           popupTag,

@@ -21,9 +21,9 @@ Zero-width spaces, non-breaking spaces that look like real ones, bidi controls, 
 
 ## Screenshots
 
-| Extension side panel (scan) | After clean |
-|---|---|
-| ![Side panel showing hidden character preview](docs/screenshots/sidepanel-with-hidden.png) | ![Side panel after cleaning text](docs/screenshots/sidepanel-after-clean.png) |
+| Empty | Hidden characters | Dark |
+|---|---|---|
+| ![Empty side panel](docs/screenshots/sidepanel-empty.png) | ![Scan](docs/screenshots/sidepanel-with-hidden.png) | ![Dark scan](docs/screenshots/sidepanel-dark.png) |
 
 Store listing assets (fixed sizes for submission) live in [`store-assets/`](store-assets/).
 

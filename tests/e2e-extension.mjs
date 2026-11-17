@@ -14,6 +14,7 @@ fs.mkdirSync(artifacts, { recursive: true });
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.png': 'image/png',
   '.json': 'application/json',
@@ -71,8 +72,11 @@ page.on('console', (msg) => {
   if (msg.type() === 'error') errors.push(msg.text());
 });
 
+await page.setViewportSize({ width: 420, height: 820 });
+await page.emulateMedia({ colorScheme: 'light' });
 await page.goto(`http://127.0.0.1:${port}/sidepanel.html`, { waitUntil: 'domcontentloaded' });
 await page.waitForSelector('#in');
+await page.screenshot({ path: path.join(artifacts, 'sidepanel-empty.png'), fullPage: true });
 
 const ZWSP = '\u200B';
 await page.fill('#in', `he${ZWSP}llo`);
@@ -82,6 +86,9 @@ if ((await page.locator('#preview mark.mark').count()) < 1) {
   process.exitCode = 1;
 } else {
   await page.screenshot({ path: path.join(artifacts, 'sidepanel-with-hidden.png'), fullPage: true });
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.screenshot({ path: path.join(artifacts, 'sidepanel-dark.png'), fullPage: true });
+  await page.emulateMedia({ colorScheme: 'light' });
   await page.click('#clean');
   await page.waitForSelector('#out:not([hidden])');
   const out = await page.inputValue('#out');

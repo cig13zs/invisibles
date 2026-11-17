@@ -27,6 +27,7 @@ jobs:
           node core.test.js
           node site.test.js
           node extension.test.js
+          node tests/visual.test.js
           node store-assets.test.js
           python3 tests/package.test.py
 

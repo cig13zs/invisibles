@@ -6,6 +6,8 @@
   var output = document.getElementById('out');
   var summary = document.getElementById('summary');
   var mode = new URLSearchParams(location.search).get('mode') || 'clean';
+  var hint = document.getElementById('firstrun');
+  if (hint) hint.hidden = true;
 
   input.value = mode === 'review'
     ? 'user\u200b_id,name\u00a0\nalpha,1'

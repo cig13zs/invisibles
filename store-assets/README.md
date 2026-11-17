@@ -14,7 +14,7 @@ Use the copy in `listing.txt`, category `Tools`, and the public privacy URL:
 
 `https://cig13zs.github.io/invisibles/privacy.html`
 
-The privacy dashboard should disclose that users paste text into the extension and that all character analysis and cleaning happen locally. The extension collects and transfers no user data. Its sole permission is `sidePanel`; it has no host permissions or content scripts.
+The privacy dashboard should disclose that users paste text into the extension and that all character analysis and cleaning happen locally. The extension collects and transfers no user data. Permissions are `sidePanel` (the panel) and `storage` (the punctuation toggle and dismissed hint only). It has no host permissions or content scripts.
 
 ## Images
 

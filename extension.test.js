@@ -29,6 +29,10 @@ assert.match(panel, /id="firstrun"/);
 assert.match(panel, /role="group"/);
 assert.match(panel, /id="drop"[^>]*role="button"/);
 assert.match(panel, /aria-keyshortcuts/);
+assert.match(panel, /theme\.css/);
+assert.match(panel, /id="empty"/);
+assert.match(fs.readFileSync('extension/theme.css', 'utf8'), /prefers-reduced-motion/);
+assert.match(fs.readFileSync('extension/theme.css', 'utf8'), /--font-mono/);
 
 assert.strictEqual(manifest.version, require('./core.js').VERSION);
 

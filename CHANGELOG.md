@@ -2,6 +2,8 @@
 
 ## 1.4.1 (2026-11-17)
 
+- Visual design system for the side panel and web app: shared color, type, spacing, and radius tokens; copper-on-paper light theme and ink dark theme; monospace for the text you inspect; crafted buttons, a switch, category chips, and reveal marks. Motion respects `prefers-reduced-motion`.
+- New extension icon and Chrome Web Store screenshot / promo tile.
 - Extension: explicit strict `content_security_policy` on extension pages; summary and category
   chips render with the DOM instead of `innerHTML` (preview marks still escape dynamic titles).
 - Settings persist via `chrome.storage.sync`: punctuation-normalize toggle and first-run hint dismissal.
