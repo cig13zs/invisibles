@@ -43,10 +43,3 @@ jobs:
 
       - name: Extension UI E2E smoke
         run: npm run test:e2e
-
-      - uses: actions/upload-artifact@ea16584ca1a77a5c099c5c0e0dd0dd5e71b8b2f6 # v4.6.2
-        if: always()
-        with:
-          name: e2e-screenshots
-          path: artifacts/e2e/*.png
-          if-no-files-found: ignore
