@@ -43,23 +43,46 @@ const { port } = server.address();
 const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext();
 await context.addInitScript(() => {
-  const store = { hintDismissed: true };
+  const store = { hintDismissed: true, removedTotal: 0 };
+  globalThis.__badge = '';
   globalThis.chrome = {
     storage: {
       sync: {
         get(keys, cb) {
-          cb(store);
+          const out = {};
+          Object.keys(keys || {}).forEach((key) => {
+            out[key] = Object.prototype.hasOwnProperty.call(store, key) ? store[key] : keys[key];
+          });
+          cb(out);
         },
         set(obj, cb) {
           Object.assign(store, obj);
           if (cb) cb();
         },
       },
-      local: null,
+      local: {
+        get(keys, cb) {
+          const out = {};
+          Object.keys(keys || {}).forEach((key) => {
+            out[key] = Object.prototype.hasOwnProperty.call(store, key) ? store[key] : keys[key];
+          });
+          cb(out);
+        },
+        set(obj, cb) {
+          Object.assign(store, obj);
+          if (cb) cb();
+        },
+      },
+    },
+    action: {
+      setBadgeText(details) {
+        globalThis.__badge = details && details.text ? details.text : '';
+      },
+      setBadgeBackgroundColor() {},
     },
     runtime: {
       getManifest() {
-        return { version: '1.4.1' };
+        return { version: '2.0.0' };
       },
     },
   };
@@ -81,6 +104,11 @@ await page.screenshot({ path: path.join(artifacts, 'sidepanel-empty.png'), fullP
 const ZWSP = '\u200B';
 await page.fill('#in', `he${ZWSP}llo`);
 await page.waitForSelector('.verdict.dirty');
+const badge = await page.evaluate(() => globalThis.__badge);
+if (badge !== '1') {
+  console.error('Expected toolbar badge 1, got', JSON.stringify(badge));
+  process.exitCode = 1;
+}
 if ((await page.locator('#preview mark.mark').count()) < 1) {
   console.error('Expected preview mark for zero-width space');
   process.exitCode = 1;
@@ -97,10 +125,35 @@ if ((await page.locator('#preview mark.mark').count()) < 1) {
     process.exitCode = 1;
   } else {
     await page.screenshot({ path: path.join(artifacts, 'sidepanel-after-clean.png'), fullPage: true });
+    await page.fill('#in', 'pay p\u0430ypal');
+    await page.waitForSelector('#lookalikes:not([hidden])');
+    const warning = await page.locator('#lookalikes').innerText();
+    if (!warning.includes('paypal')) {
+      console.error('Look-alike warning missing:', warning);
+      process.exitCode = 1;
+    } else {
+      await page.screenshot({ path: path.join(artifacts, 'sidepanel-lookalike.png'), fullPage: true });
+    }
+    await page.locator('label.opt', { has: page.locator('#paste') }).click();
+    await page.locator('#in').focus();
+    const pasted = await page.evaluate((zwsp) => {
+      const el = document.getElementById('in');
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+      const dt = new DataTransfer();
+      dt.setData('text/plain', 'he' + zwsp + 'llo');
+      const ev = new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: dt });
+      el.dispatchEvent(ev);
+      return el.value.endsWith('hello');
+    }, ZWSP);
+    if (!pasted) {
+      console.error('Clean-on-paste did not strip the zero-width space');
+      process.exitCode = 1;
+    }
     if (errors.length) {
       console.error('Console errors:', errors);
       process.exitCode = 1;
-    } else {
+    } else if (!process.exitCode) {
       console.log('ok, extension UI e2e smoke passed');
       console.log('ARTIFACTS=' + artifacts);
     }

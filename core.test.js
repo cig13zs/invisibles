@@ -104,6 +104,79 @@ assert.deepStrictEqual(I.decodeHidden(null), []);
 assert.strictEqual(I.scan(null).total, 0);
 assert.strictEqual(I.clean(undefined), '');
 
+// Blank fillers and invisible operators that survive copy/paste.
+['\u3164', '\u180E', '\u034F', '\u2062', '\u2064', '\uFFA0'].forEach(function (ch) {
+  assert.strictEqual(I.scan('a' + ch + 'b').total, 1, 'filler flagged ' + I.hex(ch.codePointAt(0)));
+  assert.strictEqual(I.clean('a' + ch + 'b'), 'ab', 'filler stripped ' + I.hex(ch.codePointAt(0)));
+});
+
+// AI-style punctuation is visible, so scan leaves it. aiStyle counts it, and
+// names the narrow space without calling it an authorship watermark.
+var styled = 'Cost\u202F 5 — a “quote”…';
+assert.strictEqual(I.scan(styled).counts.space, 1);
+assert.strictEqual(I.scan(styled).total, 1, 'em dash and smart quotes stay unflagged');
+var style = I.aiStyle(styled);
+assert.strictEqual(style.punctuation.emDash, 1);
+assert.strictEqual(style.punctuation.smartDouble, 2);
+assert.strictEqual(style.punctuation.ellipsis, 1);
+assert.strictEqual(style.punctuation.total, 4);
+assert.strictEqual(style.notable[0].cp, 0x202F);
+assert.ok(style.notable[0].note.indexOf('textGrain') !== -1);
+assert.ok(style.notable[0].note.indexOf('not its textGrain') !== -1);
+assert.strictEqual(I.applyClean(styled, { punctuation: true }), 'Cost  5 -- a "quote"...');
+assert.deepStrictEqual(I.aiStyle(null), { punctuation: { emDash: 0, enDash: 0, minus: 0, smartSingle: 0, smartDouble: 0, ellipsis: 0, total: 0 }, notable: [] });
+
+// Look-alike letters: mixed Latin/Cyrillic words and homograph hostnames.
+// A word that is entirely Cyrillic, and a real German IDN, stay quiet.
+var paypal = I.homoglyphs('pay with p\u0430ypal');
+assert.strictEqual(paypal.findings.length, 1);
+assert.strictEqual(paypal.findings[0].wordSkeleton, 'paypal');
+assert.strictEqual(paypal.findings[0].hex, 'U+0430');
+assert.deepStrictEqual(I.homoglyphs('\u0442\u0435\u0441\u0442').findings, []);
+assert.deepStrictEqual(I.homoglyphs('https://b\u00FCcher.de/x').urls, []);
+assert.deepStrictEqual(I.homoglyphs('https://example.com/path').urls, []);
+assert.strictEqual(I.homoglyphs('\uFF28\uFF45\uFF4C\uFF4C\uFF4F').findings[0].wordSkeleton, 'Hello');
+assert.strictEqual(I.homoglyphs('use \u{1D41A}').findings[0].looksLike, 'a');
+
+var apple = '\u0430\u0440\u0440\u04CF\u0435.com';
+var { domainToASCII } = require('url');
+var hostHit = I.homoglyphs('See http://' + apple + '/login now');
+assert.strictEqual(hostHit.urls.length, 1);
+assert.strictEqual(hostHit.urls[0].skeleton, 'apple.com');
+assert.strictEqual(hostHit.urls[0].ascii, domainToASCII(apple));
+assert.strictEqual(hostHit.findings.length, 0, 'hostname letters are not also reported as words');
+var viaPuny = I.homoglyphs('http://' + domainToASCII(apple) + '/x');
+assert.strictEqual(viaPuny.urls[0].skeleton, 'apple.com');
+assert.strictEqual(viaPuny.urls[0].host, apple);
+var mixedIdn = 'b\u00FCch\u0435r.de';
+assert.strictEqual(I.homoglyphs('https://' + mixedIdn).urls[0].ascii, domainToASCII(mixedIdn));
+assert.deepStrictEqual(I.homoglyphs(null), { findings: [], urls: [] });
+
+// Trojan Source: overrides block, prose directional marks do not, and a diff
+// only treats added lines as code.
+var attack = I.reviewCode('if (access) { /*\u202E } return;*/');
+assert.strictEqual(attack.verdict, 'block');
+assert.ok(attack.findings.some(function (f) { return f.kind === 'bidi' && f.hex === 'U+202E'; }));
+assert.ok(attack.findings.some(function (f) { return f.kind === 'bidi-unterminated'; }));
+assert.strictEqual(I.reviewCode('Hello \u200E world').verdict, 'clean');
+assert.strictEqual(I.reviewCode('Notes \u2014 ready').verdict, 'clean');
+
+var diff = [
+  'diff --git a/pay.js b/pay.js',
+  '@@ -1,2 +1,2 @@',
+  '-var p\u0430y = 1;',
+  '+var p\u0430y = 1;',
+  ' context \u202E stays visible'
+].join('\n');
+var reviewed = I.reviewCode(diff);
+assert.strictEqual(reviewed.diff, true);
+assert.strictEqual(reviewed.verdict, 'block');
+assert.ok(reviewed.findings.some(function (f) { return f.line === 4 && f.kind === 'homoglyph'; }));
+assert.ok(reviewed.findings.some(function (f) { return f.line === 5 && f.kind === 'bidi'; }));
+assert.ok(!reviewed.findings.some(function (f) { return f.line === 3; }), 'removed diff lines are not treated as code');
+assert.strictEqual(I.reviewCode('').verdict, 'clean');
+assert.strictEqual(I.reviewCode(null).verdict, 'clean');
+
 // The extension ships its own copy of core.js. They drifted once already.
 const fs = require('fs');
 const path = require('path');

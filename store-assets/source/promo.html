@@ -8,6 +8,7 @@
     body{position:relative;background:#241c16;color:#f6f1e8;font-family:"Segoe UI",system-ui,sans-serif;padding:22px 24px}
     body:before{content:"";position:absolute;width:220px;height:220px;right:-70px;bottom:-90px;border-radius:50%;background:rgba(196,83,42,.35)}
     header{display:flex;align-items:center;gap:12px;position:relative}
+    header div{min-width:0}
     img{width:64px;height:64px;border-radius:16px}
     h1{margin:0;font:700 32px/1 Palatino,Georgia,serif;letter-spacing:-.03em}
     p{margin:4px 0 0;color:#d9cfc3;font-size:13px}
@@ -19,7 +20,7 @@
   </style>
 </head>
 <body>
-  <header><img src="../../extension/icons/icon128.png" alt=""><div><h1>Invisibles</h1><p>Reveal and clean hidden Unicode locally.</p></div></header>
+    <header><img src="../../extension/icons/icon128.png" alt=""><div><h1>Invisibles</h1><p>Find and remove hidden characters.</p></div></header>
   <div class="sample"><div class="before">notes<span class="code">U+200B</span> ready<span class="code">U+00A0</span>now</div><div class="after">Clean copy: notes ready now</div></div>
   <div class="foot">No host access · nothing uploaded</div>
 </body>

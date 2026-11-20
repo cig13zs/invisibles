@@ -11,7 +11,7 @@
 
   input.value = mode === 'review'
     ? 'user\u200b_id,name\u00a0\nalpha,1'
-    : 'Release\u200b notes\u00a0ready \u2066for review\u2069.';
+    : 'Release\u200b notes\u00a0ready.';
   input.dispatchEvent(new Event('input', { bubbles: true }));
   if (mode !== 'review') clean.click();
 

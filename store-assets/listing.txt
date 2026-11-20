@@ -1,19 +1,34 @@
-Invisibles: Hidden Unicode Cleaner
+Invisibles: Find & Remove Hidden Characters (AI text cleaner)
 
-Reveal zero-width spaces, bidi controls and look-alike whitespace, then clean them locally.
+Find the characters you cannot see, then remove them. Paste an AI reply, a link, a spreadsheet cell, or a diff. Invisibles names every hidden character, warns when a letter or a hostname only looks familiar, and flags bidirectional controls that can make code display differently from how it runs.
 
-Paste text into the side panel to see the hidden characters it contains. Invisibles names each category and code point before you choose whether to clean the text.
+It runs in the side panel, on your device.
 
-It can find zero-width characters, non-breaking and look-alike spaces, bidirectional controls, soft hyphens, tag characters, variation selectors, and other non-printing controls. When tag characters or variation selectors carry hidden text, the panel decodes it and shows it in plain words. Look-alike spaces become normal spaces; other flagged characters are removed. Joiners and selectors that are part of an emoji are kept, so cleaning never breaks emoji. Optional punctuation normalization is off by default.
+What it finds
+- Zero-width spaces, joiners, the word joiner, the byte-order mark, Hangul filler, and other blank characters
+- No-break spaces and other look-alike spaces, including the narrow no-break space reported in some chatbot replies
+- Bidirectional controls (Trojan Source), including on lines you paste from a diff
+- Soft hyphens, tag characters, variation selectors, and other non-printing controls
+- Hidden text carried by tag characters or variation selectors, decoded into plain words
+- Look-alike letters in a Latin word, and hostnames that resemble a different name (shown with the DNS form)
+- Visible punctuation people associate with chatbot paste — em dashes, smart quotes, ellipsis — counted separately, because it is not a hidden character and not proof of who wrote the text
+
+What you can do
+- See where each hidden character sits, and skip a category when you clean
+- Remove hidden characters, or turn look-alike spaces into normal spaces. Emoji stay whole
+- Clean on paste, and clean on copy from the box. Both stay off until you turn them on
+- Clean AI paste: hidden characters plus plain-ASCII punctuation, in one step
+- A toolbar badge with the current count, and a tally of how many hidden characters you have cleaned on this browser. The tally is a number. Your text is not stored
+- A suggested shortcut, Ctrl+Shift+. (Command+Shift+. on Mac), opens the panel. Change it in Chrome’s extension shortcuts
+
+What it does not do
+Invisibles identifies characters, not authorship or intent. It does not read a statistical watermark, and it does not read the pages you visit. Look-alike letters are warnings, not silent rewrites. Some hidden characters are legitimate, so review the findings before cleaning.
 
 Privacy and access
-
 - No host access: the extension cannot read the pages you visit.
 - No account, analytics, advertising, or remote service.
 - Pasted text stays in the side panel, is processed only in memory, and is never stored or transmitted.
-- Permissions: sidePanel (open the tool beside the current tab) and storage (remember your UI preferences — not your pasted text).
-
-Invisibles identifies characters, not authorship or intent. Some hidden characters are legitimate, so review the findings before cleaning.
+- Permissions: sidePanel (open the tool beside the current tab) and storage (remember UI preferences and a count of characters cleaned — not your pasted text).
 
 Category: Tools
 Language: English

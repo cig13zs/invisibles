@@ -2,12 +2,18 @@
 (function(){
   var I=window.Invisibles;
   var inEl=document.getElementById('in'),cleanBtn=document.getElementById('clean'),
+      aiBtn=document.getElementById('ai-clean'),
       copyBtn=document.getElementById('copy'),norm=document.getElementById('norm'),
+      pasteEl=document.getElementById('paste'),copyCleanEl=document.getElementById('copyclean'),
       summary=document.getElementById('summary'),chips=document.getElementById('chips'),
       out=document.getElementById('out'),delta=document.getElementById('delta'),
       preview=document.getElementById('preview'),drop=document.getElementById('drop'),
       reportBtn=document.getElementById('report'),reportMsg=document.getElementById('reportmsg'),
       hiddenMsg=document.getElementById('hidden-msg'),
+      aiNote=document.getElementById('ai-note'),
+      lookalikes=document.getElementById('lookalikes'),
+      reviewEl=document.getElementById('review'),
+      statsEl=document.getElementById('stats'),
       firstrun=document.getElementById('firstrun'),dismissHint=document.getElementById('dismiss-hint'),
       empty=document.getElementById('empty');
 
@@ -16,6 +22,7 @@
 
   // Categories the user toggled OFF; they stay in the text when cleaning.
   var skipped=[];
+  var removedTotal=0, statsLoaded=false;
 
   function esc(s){
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -36,6 +43,24 @@
     done({});
   }
 
+  function localGet(keys, done){
+    try{
+      if(typeof chrome!=='undefined'&&chrome.storage&&chrome.storage.local&&chrome.storage.local.get){
+        chrome.storage.local.get(keys,function(data){ done(data||{}); });
+        return;
+      }
+    }catch(_){}
+    done({});
+  }
+
+  function localSet(values){
+    try{
+      if(typeof chrome!=='undefined'&&chrome.storage&&chrome.storage.local&&chrome.storage.local.set){
+        chrome.storage.local.set(values);
+      }
+    }catch(_){}
+  }
+
   function storageSet(values){
     try{
       if(typeof chrome!=='undefined'&&chrome.storage&&chrome.storage.sync){
@@ -51,6 +76,99 @@
   function emojiNote(r){
     var n=r.emojiKept||0;
     return n?' Kept '+n+' character'+(n>1?'s':'')+' that hold'+(n>1?'':'s')+' emoji together.':'';
+  }
+
+  function setBadge(n){
+    var text=n>0?(n>99?'99+':String(n)):'';
+    try{
+      if(typeof chrome!=='undefined'&&chrome.action&&chrome.action.setBadgeText){
+        chrome.action.setBadgeText({text:text});
+        if(n>0&&chrome.action.setBadgeBackgroundColor){
+          chrome.action.setBadgeBackgroundColor({color:'#9F2D22'});
+        }
+      }
+    }catch(_){}
+  }
+
+  function showStats(){
+    if(!statsEl) return;
+    statsEl.textContent=removedTotal
+      ?'Cleaned '+removedTotal.toLocaleString()+' hidden character'+(removedTotal===1?'':'s')+' on this browser.'
+      :'';
+  }
+
+  function bumpStats(n){
+    n=n|0;
+    if(n<=0) return;
+    removedTotal+=n;
+    if(statsLoaded) localSet({removedTotal:removedTotal});
+    showStats();
+  }
+
+  function noteLine(parent, text){
+    var p=document.createElement('p');
+    p.style.unicodeBidi='isolate';
+    p.textContent=text;
+    parent.appendChild(p);
+    return p;
+  }
+
+  function renderAi(text){
+    if(!aiNote) return;
+    var info=text?I.aiStyle(text):null;
+    aiNote.replaceChildren();
+    if(!info||(!info.punctuation.total&&!info.notable.length)){ aiNote.hidden=true; return; }
+    aiNote.hidden=false;
+    if(info.punctuation.total){
+      var bits=[], punc=info.punctuation;
+      if(punc.emDash) bits.push(punc.emDash+' em dash'+(punc.emDash>1?'es':''));
+      if(punc.enDash) bits.push(punc.enDash+' en dash'+(punc.enDash>1?'es':''));
+      var quotes=punc.smartSingle+punc.smartDouble;
+      if(quotes) bits.push(quotes+' smart quote'+(quotes>1?'s':''));
+      if(punc.ellipsis) bits.push(punc.ellipsis+' ellipsis');
+      if(punc.minus) bits.push(punc.minus+' minus sign'+(punc.minus>1?'s':''));
+      noteLine(aiNote, bits.join(', ')+'. Visible punctuation, not a hidden character, and not proof of who wrote it. Clean AI paste turns it into plain ASCII.');
+    }
+    info.notable.forEach(function(n){
+      noteLine(aiNote, n.count+' × '+n.hex+' '+n.name+'. '+n.note);
+    });
+  }
+
+  function renderLookalikes(text){
+    if(!lookalikes) return;
+    var h=text?I.homoglyphs(text):{findings:[],urls:[]};
+    lookalikes.replaceChildren();
+    if(!h.findings.length&&!h.urls.length){ lookalikes.hidden=true; return; }
+    lookalikes.hidden=false;
+    var title=noteLine(lookalikes, 'Look-alike letters');
+    title.className='card-title';
+    var seen={}, shown=0;
+    h.findings.forEach(function(f){
+      if(seen[f.wordIndex]||shown>=4){ seen[f.wordIndex]=true; return; }
+      seen[f.wordIndex]=true;
+      shown++;
+      noteLine(lookalikes, f.hex+' resembles '+f.looksLike+'. The word resembles "'+f.wordSkeleton+'". Letters are not rewritten.');
+    });
+    h.urls.slice(0,3).forEach(function(u){
+      noteLine(lookalikes, 'Hostname resembles "'+u.skeleton+'". DNS form: '+u.ascii+'.');
+    });
+    if(h.findings.length>shown||h.urls.length>3){
+      noteLine(lookalikes, 'More look-alikes are in the text.');
+    }
+  }
+
+  function renderReview(text){
+    if(!reviewEl) return;
+    var r=text?I.reviewCode(text):null;
+    reviewEl.replaceChildren();
+    if(!r||r.verdict==='clean'){ reviewEl.hidden=true; return; }
+    reviewEl.hidden=false;
+    var title=noteLine(reviewEl, (r.verdict==='block'?'Code review: block':'Code review: look closer')+(r.diff?' (pasted diff)':''));
+    title.className='card-title';
+    r.findings.slice(0,2).forEach(function(f){
+      noteLine(reviewEl, 'Line '+f.line+': '+(f.hex?f.hex+' '+f.name+'. ':'')+f.message);
+    });
+    if(r.findings.length>2) noteLine(reviewEl, 'and '+(r.findings.length-2)+' more.');
   }
 
   function setSummary(text,verdictClass,verdictText,rest){
@@ -107,10 +225,22 @@
     });
   }
 
+  function syncActions(text, total){
+    var punct=text?I.aiStyle(text).punctuation.total:0;
+    cleanBtn.disabled=!text||(total===0&&!norm.checked);
+    if(aiBtn) aiBtn.disabled=!text||(total===0&&punct===0);
+  }
+
   function render(){
     var text=inEl.value,r=I.scan(text);
+    var hint=document.getElementById('scan-hint');
+    if(hint) hint.hidden=!!text;
     renderHidden(hiddenMsg,r.total?text:'');
-    cleanBtn.disabled=!text||(r.total===0&&!norm.checked);
+    renderAi(text);
+    renderLookalikes(text);
+    renderReview(text);
+    syncActions(text, r.total);
+    setBadge(text?r.total:0);
     if(!text){
       setSummary('','','','');
       if(empty) empty.hidden=false;
@@ -159,17 +289,28 @@
     preview.style.display=html?'block':'none';
   }
 
-  function doClean(){
-    var before=inEl.value,t=I.cleanWith(before,skipped);
-    if(norm.checked) t=I.normalizePunctuation(t);
-    out.value=t; out.hidden=false; copyBtn.hidden=false;
-  // Report replacements separately because they do not change string length.
-    var r=I.scan(before),swapped=r.counts.space||0,deleted=r.total-swapped,parts=[];
+  function showClean(before, cleaned, punctuation){
+    out.value=cleaned; out.hidden=false; copyBtn.hidden=false;
+    var beforeScan=I.scan(before), afterScan=I.scan(cleaned);
+    var gone=beforeScan.total-afterScan.total;
+    var swapped=Math.max(0,(beforeScan.counts.space||0)-(afterScan.counts.space||0));
+    var deleted=Math.max(0, gone-swapped), parts=[];
     if(deleted) parts.push(deleted+' removed');
     if(swapped) parts.push(swapped+' turned into a normal space');
-    if(skipped.length&&deleted+swapped<r.total) parts.push((r.total-deleted-swapped)+' left (skipped)');
-    if(!parts.length) delta.textContent=norm.checked?'Punctuation normalized.':'Nothing to change.';
-    else delta.textContent=parts.join(', ')+'.'+(norm.checked?' Punctuation normalized.':'');
+    if(afterScan.total) parts.push(afterScan.total+' left (skipped)');
+    if(!parts.length) delta.textContent=punctuation?'Punctuation normalized.':'Nothing to change.';
+    else delta.textContent=parts.join(', ')+'.'+(punctuation?' Punctuation normalized.':'');
+    bumpStats(gone);
+  }
+
+  function doClean(){
+    var before=inEl.value;
+    showClean(before, I.applyClean(before,{skip:skipped, punctuation:norm.checked}), norm.checked);
+  }
+
+  function doAiClean(){
+    var before=inEl.value;
+    showClean(before, I.applyClean(before,{punctuation:true}), true);
   }
 
   copyBtn.addEventListener('click',function(){
@@ -233,7 +374,42 @@
   });
 
   document.addEventListener('keydown',function(ev){
-    if((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter'&&!cleanBtn.disabled){ev.preventDefault();doClean();}
+    if(!((ev.ctrlKey||ev.metaKey)&&ev.key==='Enter')) return;
+    ev.preventDefault();
+    if(ev.shiftKey){ if(aiBtn&&!aiBtn.disabled) doAiClean(); }
+    else if(!cleanBtn.disabled) doClean();
+  });
+
+  inEl.addEventListener('paste',function(ev){
+    if(!pasteEl||!pasteEl.checked) return;
+    var data=ev.clipboardData&&ev.clipboardData.getData('text');
+    if(!data) return;
+    var cleaned=I.applyClean(data,{punctuation:!!norm.checked});
+    if(cleaned===data) return;
+    ev.preventDefault();
+    var start=inEl.selectionStart, end=inEl.selectionEnd;
+    if(typeof inEl.setRangeText==='function') inEl.setRangeText(cleaned, start, end, 'end');
+    else inEl.value=inEl.value.slice(0,start)+cleaned+inEl.value.slice(end);
+    render();
+    var removed=I.scan(data).total;
+    if(removed) delta.textContent='Paste cleaned: '+removed+' hidden character'+(removed>1?'s':'')+' removed.'+(norm.checked?' Punctuation normalized if any.':'');
+    else delta.textContent='Paste cleaned: punctuation normalized.';
+    bumpStats(removed);
+  });
+
+  inEl.addEventListener('copy',function(ev){
+    if(!copyCleanEl||!copyCleanEl.checked||!ev.clipboardData) return;
+    var start=inEl.selectionStart, end=inEl.selectionEnd;
+    if(start===end) return;
+    var slice=inEl.value.slice(start, end);
+    var cleaned=I.applyClean(slice,{skip:skipped, punctuation:!!norm.checked});
+    if(cleaned===slice) return;
+    ev.preventDefault();
+    ev.clipboardData.setData('text/plain', cleaned);
+    var removed=I.scan(slice).total;
+    delta.textContent=removed
+      ?'Copied a cleaned selection ('+removed+' hidden).'
+      :'Copied the selection with punctuation normalized.';
   });
 
   // --- reporting a miss ------------------------------------------------------
@@ -264,9 +440,26 @@
       'Invisibles '+v,
       'Input: '+text.length+' characters, '+nonAscii+' of them non-ASCII',
       'Flagged: '+r.total,''];
+    var look=I.homoglyphs(text), seenLike={};
+    look.findings.forEach(function(f){
+      if(!seenLike[f.hex]) seenLike[f.hex]={n:0,name:f.name};
+      seenLike[f.hex].n++;
+    });
+    look.urls.forEach(function(u){
+      u.letters.forEach(function(letter){
+        if(!seenLike[letter.hex]) seenLike[letter.hex]={n:0,name:letter.name};
+        seenLike[letter.hex].n++;
+      });
+    });
+    Object.keys(seenLike).sort().forEach(function(h){
+      lines.push('- '+h+'  '+seenLike[h].name+'  (look-alike) x'+seenLike[h].n);
+    });
+    lines.push('Code review: '+I.reviewCode(text).verdict);
+    lines.push('Look-alike hostnames: '+look.urls.length);
+
     if(lines.length) body=body.concat(lines,['']);
     body.push('---','Built when the link was pressed. Your text is not included - only the '+
-      'code points that were flagged, and the two counts above.');
+      'code points that were flagged, plus counts. Words and hostnames are not included.');
     return body.join(NL);
   }
 
@@ -284,6 +477,12 @@
     storageSet({normalizePunct:!!norm.checked});
     render();
   });
+  if(pasteEl) pasteEl.addEventListener('change',function(){
+    storageSet({cleanOnPaste:!!pasteEl.checked});
+  });
+  if(copyCleanEl) copyCleanEl.addEventListener('change',function(){
+    storageSet({cleanOnCopy:!!copyCleanEl.checked});
+  });
 
   if(dismissHint&&firstrun){
     dismissHint.addEventListener('click',function(){
@@ -292,12 +491,28 @@
     });
   }
 
-  inEl.addEventListener('input',render);
+  inEl.addEventListener('input',function(){
+    if(delta) delta.textContent='';
+    if(out){ out.hidden=true; out.value=''; }
+    if(copyBtn) copyBtn.hidden=true;
+    var hint=document.getElementById('scan-hint');
+    if(hint) hint.hidden=!!inEl.value;
+    render();
+  });
   cleanBtn.addEventListener('click',doClean);
+  if(aiBtn) aiBtn.addEventListener('click',doAiClean);
 
-  storageGet({normalizePunct:false,hintDismissed:false},function(data){
+  storageGet({normalizePunct:false,hintDismissed:false,cleanOnPaste:false,cleanOnCopy:false},function(data){
     norm.checked=!!data.normalizePunct;
+    if(pasteEl) pasteEl.checked=!!data.cleanOnPaste;
+    if(copyCleanEl) copyCleanEl.checked=!!data.cleanOnCopy;
     if(firstrun) firstrun.hidden=!!data.hintDismissed;
     render();
+  });
+  localGet({removedTotal:0},function(data){
+    removedTotal=(Number(data&&data.removedTotal)||0)+(statsLoaded?0:removedTotal);
+    statsLoaded=true;
+    localSet({removedTotal:removedTotal});
+    showStats();
   });
 })();

@@ -120,12 +120,13 @@ h1 .badge {
 }
 .sub { margin: 4px 0 0; color: var(--muted); font-size: var(--text-sm); line-height: 1.45; }
 
-.content { flex: 1; display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; }
+.content { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; }
 
 textarea {
   width: 100%;
-  min-height: 120px;
-  flex: 1;
+  min-height: 88px;
+  height: 88px;
+  flex: none;
   resize: vertical;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -298,7 +299,23 @@ button.chip:hover:not(:disabled) { transform: none; border-color: var(--cat, var
 .hidden-msg p + p { margin-top: 4px; }
 .hidden-msg q { font-family: var(--font-mono); color: var(--ink); word-break: break-word; }
 
-#out { background: var(--raised); flex: 1; min-height: 100px; }
+#out { background: var(--raised); flex: none; height: 72px; min-height: 72px; }
+.note-card {
+  flex: none;
+  border: 1px solid var(--line);
+  background: var(--raised);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: var(--text-sm);
+}
+.note-card.warn {
+  border-color: color-mix(in srgb, var(--hit) 45%, var(--line));
+  background: var(--hit-soft);
+}
+.note-card p { margin: 0; }
+.note-card p + p { margin-top: 4px; }
+.note-card .card-title { font-weight: 750; color: var(--ink); }
+#stats:empty { display: none; }
 .hint { font-size: var(--text-sm); color: var(--muted); flex: none; }
 .dropzone {
   flex: none;

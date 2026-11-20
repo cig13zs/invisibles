@@ -24,7 +24,7 @@ I aim to reply within one week. Credit in the fix is welcome unless you prefer t
 ## Design assumptions
 
 - **No host access** — the extension must not read arbitrary web pages.
-- **No pasted-text exfiltration** — “Report a miss” must not include user input, only scan metadata.
+- **No pasted-text exfiltration** — “Report a miss” must not include user input, only scan metadata. That includes no pasted words, hostnames, or decoded hidden text — code points and counts only.
 - **Strict extension CSP** — no `unsafe-eval`, no remote script in extension pages.
 - **Decoded hidden text is untrusted** — render with `textContent`, not raw HTML.
 

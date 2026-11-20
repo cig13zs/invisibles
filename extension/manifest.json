@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Invisibles: hidden character cleaner",
-  "version": "1.4.1",
-  "description": "Find and strip hidden characters locally. Side panel only: no host access, no remote code.",
+  "name": "Invisibles: Find & Remove Hidden Characters (AI text cleaner)",
+  "version": "2.0.0",
+  "description": "Find and remove hidden characters, look-alike letters, and bidi tricks in pasted text. Local only, no host access.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -19,7 +19,7 @@
     "default_path": "sidepanel.html"
   },
   "action": {
-    "default_title": "Invisibles: clean hidden characters",
+    "default_title": "Invisibles: find and remove hidden characters",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -28,5 +28,14 @@
   },
   "background": {
     "service_worker": "background.js"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Period",
+        "mac": "Command+Shift+Period"
+      },
+      "description": "Open the hidden-character cleaner"
+    }
   }
 }

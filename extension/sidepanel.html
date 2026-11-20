@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Find and remove hidden Unicode characters locally in your browser.">
-<title>Invisibles Sidebar</title>
+<title>Invisibles: find and remove hidden characters</title>
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
  <div class="header">
  <h1><span class="logo" aria-hidden="true"><svg viewBox="0 0 32 32" width="18" height="18" fill="none"><path d="M2 16s5.5-8 14-8 14 8 14 8-5.5 8-14 8S2 16 2 16Z" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="16" r="4.5" fill="currentColor"/><circle cx="17.4" cy="14.6" r="1.3" fill="#fffdf8"/></svg></span> Invisibles <span class="badge">Local</span></h1>
- <p class="sub">Processed locally: pasted text stays in this panel and is never stored or uploaded.</p>
+ <p class="sub">Find and remove hidden characters. Pasted text stays in this panel and is never stored or uploaded.</p>
  </div>
 
  <div id="firstrun" class="firstrun" role="note">
- <p>Paste text here (or drop a file). Hidden characters show in the preview below. Tap a category chip to leave that type in place. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> or <kbd>⌘</kbd>+<kbd>Enter</kbd> runs Clean it.</p>
+ <p>Paste text, a link, or a diff. Hidden characters, look-alike letters, and bidirectional controls show below. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> cleans. Chrome’s suggested shortcut to open this panel is <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>.</kbd> (change it under extension shortcuts).</p>
  <button type="button" id="dismiss-hint">Got it</button>
  </div>
 
@@ -25,11 +25,14 @@
 
  <div class="row">
  <button id="clean" class="primary" type="button" disabled aria-keyshortcuts="Control+Enter Meta+Enter">Clean it</button>
+ <button id="ai-clean" type="button" disabled title="Strip hidden characters and turn smart quotes, dashes, and ellipsis into plain ASCII" aria-keyshortcuts="Control+Shift+Enter Meta+Shift+Enter">Clean AI paste</button>
  <button id="copy" type="button" hidden>Copy clean text</button>
  <span class="kbd-hint" aria-hidden="true"><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>
  </div>
 
  <label class="opt"><input type="checkbox" id="norm"><span class="switch-ui" aria-hidden="true"></span> Also normalize smart quotes and em dashes</label>
+ <label class="opt"><input type="checkbox" id="paste"><span class="switch-ui" aria-hidden="true"></span> Clean hidden characters when I paste</label>
+ <label class="opt"><input type="checkbox" id="copyclean"><span class="switch-ui" aria-hidden="true"></span> Clean hidden characters when I copy from this box</label>
 
  <div id="empty" class="empty">
   <div class="empty-glyph" aria-hidden="true">&#x25AC;</div>
@@ -38,6 +41,9 @@
  <div id="summary" role="status" aria-live="polite" hidden></div>
  <div id="chips" role="group" aria-label="Hidden character categories. Toggle to skip a category when cleaning."></div>
  <div id="hidden-msg" class="hidden-msg" role="note" hidden></div>
+ <div id="ai-note" class="note-card" role="note" hidden></div>
+ <div id="lookalikes" class="note-card warn" role="note" hidden></div>
+ <div id="review" class="note-card warn" role="note" hidden></div>
  <div id="preview" aria-label="Where the hidden characters sit in your text"></div>
 
  <label class="sr-only" for="out">Clean text</label>
@@ -47,6 +53,7 @@
  <div class="dropzone" id="drop" role="button" tabindex="0" aria-label="Load a text file. Accepts .txt, .md, .csv, .json, and .log.">...or drop a .txt / .md / .csv file here (click to browse)</div>
 
  <div class="footer">
+ <p class="hint" id="stats"></p>
  <div class="links">
  <a class="kofi" href="https://ko-fi.com/jju1s" target="_blank" rel="noopener">Ko-fi</a>
  <a class="gh" href="https://github.com/cig13zs/invisibles" target="_blank" rel="noopener">GitHub</a>
