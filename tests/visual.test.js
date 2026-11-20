@@ -9,7 +9,8 @@ const shots = [
   'docs/screenshots/sidepanel-empty.png',
   'docs/screenshots/sidepanel-with-hidden.png',
   'docs/screenshots/sidepanel-after-clean.png',
-  'docs/screenshots/sidepanel-dark.png'
+  'docs/screenshots/sidepanel-dark.png',
+  'docs/screenshots/sidepanel-lookalike.png'
 ];
 
 for (const relative of shots) {

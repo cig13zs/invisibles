@@ -45,6 +45,10 @@ for (const src of [popupJs, site]) {
 
 assert.match(site, /swapped = r\.counts\.space \|\| 0/);
 assert.match(site, /turned into a normal space/);
+assert.match(site, /I\.homoglyphs\(/);
+assert.match(site, /I\.reviewCode\(/);
+assert.match(site, /I\.aiStyle\(/);
+assert.match(site, /I\.applyClean\(/);
 assert.doesNotMatch(site, /PlayStation trophy|typographic giveaways|AI watermark/i);
 
 console.log('ok, Invisibles site and manifest checks passed');

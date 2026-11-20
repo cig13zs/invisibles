@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.0 (2026-11-20)
+
+- Store name is now **Invisibles: Find & Remove Hidden Characters (AI text cleaner)**. The short description names look-alike letters and bidi tricks and still says the tool is local, with no host access. See [STORE_LISTING.md](STORE_LISTING.md).
+- AI paste. Em dashes, smart quotes, and ellipsis are counted as visible punctuation, not as hidden characters and not as proof of authorship. **Clean AI paste** strips hidden characters and turns that punctuation into plain ASCII. U+202F and a few other characters people meet in chatbot replies get a plain-language note. That note says the narrow no-break space reported in some 2025 ChatGPT replies is not OpenAI’s textGrain watermark.
+- Look-alike letters. A Latin word that mixes in a Cyrillic or Greek look-alike is flagged, as are fullwidth and mathematical Latin letters. A hostname that uses those letters is shown with the name it resembles and its DNS form (`xn--…`). Entirely Cyrillic or Greek words, and ordinary IDNs such as `bücher.de`, are not flagged. Letters are not rewritten.
+- Code review for pasted text. Bidirectional overrides and isolates are flagged on any line (Trojan Source), including a context line of a diff. Invisible characters and look-alike letters are flagged on lines that look like code, and on added lines of a unified diff. Removed diff lines are not treated as the change. Directional marks in ordinary prose stay quiet.
+- More blank characters are now hidden-character findings: Hangul filler (U+3164), halfwidth Hangul filler, Mongolian vowel separator, combining grapheme joiner, and the invisible math and deprecated format characters in U+2061–U+2064 and U+206A–U+206F.
+- Clean on paste and clean on copy, inside the side panel. Both default to off, so an existing install keeps today’s paste and copy behavior. No clipboard permission: the panel already receives the paste and copy events.
+- Toolbar badge shows the current hidden-character count. A `removedTotal` count in `chrome.storage.local` records how many hidden characters this browser has cleaned. The text is not stored.
+- Suggested shortcut `Ctrl+Shift+.` (`Command+Shift+.` on Mac) opens the panel via the toolbar action. `Ctrl+Shift+Enter` runs Clean AI paste. `Ctrl+Enter` still cleans.
+- Settings migration. `normalizePunct` and `hintDismissed` are the same keys as 1.4.1. `cleanOnPaste` and `cleanOnCopy` are new and default to false when missing.
+- Permissions are unchanged: `sidePanel` and `storage` only. No host access, no content scripts, no optional permissions. Per-site auto-clean, a highlight on arbitrary pages, and a live GitHub injection are not in this version because each one would let the extension read pages you visit. Paste a diff instead, and the highlight stays in the side panel.
+
 ## 1.4.1 (2026-11-17)
 
 - Visual design system for the side panel and web app: shared color, type, spacing, and radius tokens; copper-on-paper light theme and ink dark theme; monospace for the text you inspect; crafted buttons, a switch, category chips, and reveal marks. Motion respects `prefers-reduced-motion`.

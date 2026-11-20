@@ -6,6 +6,7 @@ Produced by `npm run test:e2e` (Playwright, light and dark):
 - `sidepanel-with-hidden.png`
 - `sidepanel-after-clean.png`
 - `sidepanel-dark.png`
+- `sidepanel-lookalike.png` (a mixed-script word and the warning)
 
 `before-design-scan.png` and `before-design-clean.png` are the panel before the 1.4.1 visual pass.
 

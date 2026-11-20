@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Invisibles: find and remove hidden Unicode locally</title>
-<meta name="description" content="Reveal zero-width spaces, look-alike whitespace, bidi controls, and other hidden Unicode in pasted text. Review and clean it locally in your browser.">
+<title>Invisibles: find and remove hidden characters</title>
+<meta name="description" content="Find and remove zero-width spaces, look-alike letters, and bidi controls in pasted text. Review and clean it locally in your browser.">
 <meta property="og:title" content="Invisibles">
 <meta property="og:description" content="See the invisible characters hiding in your text, then remove them. Runs in your browser.">
 <meta property="og:type" content="website">
@@ -62,6 +62,10 @@
   .hidden-msg{margin-top:12px;padding:10px 14px;border:1px solid var(--hit);border-radius:10px;background:var(--hit-soft);font-size:14px}
   .hidden-msg p{margin:0}.hidden-msg p+p{margin-top:6px}
   .hidden-msg q{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ink);word-break:break-word}
+  .note-card{margin-top:12px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--code);font-size:14px}
+  .note-card.warn{border-color:var(--hit);background:var(--hit-soft)}
+  .note-card p{margin:0}.note-card p+p{margin-top:6px}
+  .note-card .card-title{font-weight:750;color:var(--ink)}
   .hit{display:inline-block;min-width:1.15em;text-align:center;background:var(--hit-soft);color:var(--hit);border-bottom:2px solid var(--hit);border-radius:4px;padding:0 4px;margin:0 1px;font-size:11px;font-weight:750;letter-spacing:.02em;vertical-align:middle;cursor:help}
   .hint{font-size:12.5px;color:var(--muted);margin-top:10px}
   .out{margin-top:14px}
@@ -85,8 +89,8 @@
 
 <header>
   <h1>Invisibles</h1>
-  <p class="lede">Some text carries characters you can't see. Paste it below and this shows you
-  what's hiding, then strips it. It runs in your browser, so nothing gets sent anywhere.</p>
+  <p class="lede">Find hidden characters in a chatbot reply, a link, or a diff, then strip them.
+  It runs in your browser, so nothing gets sent anywhere.</p>
 </header>
 
 <main id="main">
@@ -95,12 +99,16 @@
   <textarea id="in" class="ta" placeholder="Paste your text here…" spellcheck="false" autocomplete="off"></textarea>
   <div class="row">
     <button id="clean" class="btn primary" type="button" disabled>Clean it</button>
+    <button id="ai-clean" class="btn" type="button" disabled>Clean AI paste</button>
     <label class="opt"><input type="checkbox" id="norm"> also turn smart quotes and em dashes into plain ASCII</label>
   </div>
 
   <div class="summary" id="summary" role="status" aria-live="polite"></div>
   <div class="chips" id="chips"></div>
   <div class="hidden-msg" id="hidden-msg" role="note" hidden></div>
+  <div class="note-card" id="ai-note" role="note" hidden></div>
+  <div class="note-card warn" id="lookalikes" role="note" hidden></div>
+  <div class="note-card warn" id="review" role="note" hidden></div>
   <div class="reveal" id="reveal"></div>
 
   <div class="out" id="outbox" hidden>
@@ -130,7 +138,9 @@
     <dt>Spaces that aren't spaces</dt>
     <dd>Non-breaking space, the narrow no-break space, ideographic and thin spaces. They look like a normal space and aren't one.</dd>
     <dt>Direction controls</dt>
-    <dd>Right-to-left overrides and isolates. These can reorder text on screen so it reads differently from what's stored, which is the basis of the Trojan Source trick.</dd>
+    <dd>Right-to-left overrides and isolates. These can reorder text on screen so it reads differently from what's stored, which is the Trojan Source trick. Paste a diff and the code-review lines call them out.</dd>
+    <dt>Look-alike letters</dt>
+    <dd>A Cyrillic or Greek letter mixed into a Latin word, and a hostname that resembles a different name. Those are warnings. The letters stay put so the warning is not quietly rewritten away.</dd>
     <dt>Tag characters and variation selectors</dt>
     <dd>Invisible characters that still change the stored Unicode sequence.</dd>
   </dl>
@@ -171,7 +181,58 @@
       outEl = document.getElementById('out'),
       copyBtn = document.getElementById('copy'),
       delta = document.getElementById('delta'),
-      hiddenMsg = document.getElementById('hidden-msg');
+      hiddenMsg = document.getElementById('hidden-msg'),
+      aiBtn = document.getElementById('ai-clean'),
+      aiNote = document.getElementById('ai-note'),
+      lookalikes = document.getElementById('lookalikes'),
+      reviewEl = document.getElementById('review');
+
+  function noteLine(parent, text) {
+    var p = document.createElement('p');
+    p.style.unicodeBidi = 'isolate';
+    p.textContent = text;
+    parent.appendChild(p);
+    return p;
+  }
+
+  function renderExtras(text) {
+    var info = text ? I.aiStyle(text) : null;
+    aiNote.replaceChildren();
+    aiNote.hidden = !info || (!info.punctuation.total && !info.notable.length);
+    if (!aiNote.hidden && info.punctuation.total) {
+      noteLine(aiNote, info.punctuation.total + ' visible punctuation mark' + (info.punctuation.total > 1 ? 's' : '') + ' (dashes, quotes, ellipsis). Not a hidden character, and not proof of who wrote it.');
+    }
+    if (info) info.notable.forEach(function (n) { noteLine(aiNote, n.count + ' × ' + n.hex + ' ' + n.name + '. ' + n.note); });
+
+    var homo = text ? I.homoglyphs(text) : { findings: [], urls: [] };
+    lookalikes.replaceChildren();
+    lookalikes.hidden = !homo.findings.length && !homo.urls.length;
+    if (!lookalikes.hidden) {
+      var title = noteLine(lookalikes, 'Look-alike letters');
+      title.className = 'card-title';
+      var seen = {}, shown = 0;
+      homo.findings.forEach(function (f) {
+        if (seen[f.wordIndex] || shown >= 4) { seen[f.wordIndex] = true; return; }
+        seen[f.wordIndex] = true;
+        shown++;
+        noteLine(lookalikes, f.hex + ' resembles ' + f.looksLike + '. The word resembles "' + f.wordSkeleton + '".');
+      });
+      homo.urls.slice(0, 3).forEach(function (u) {
+        noteLine(lookalikes, 'Hostname resembles "' + u.skeleton + '". DNS form: ' + u.ascii + '.');
+      });
+    }
+
+    var review = text ? I.reviewCode(text) : null;
+    reviewEl.replaceChildren();
+    reviewEl.hidden = !review || review.verdict === 'clean';
+    if (!reviewEl.hidden) {
+      var head = noteLine(reviewEl, (review.verdict === 'block' ? 'Code review: block' : 'Code review: look closer') + (review.diff ? ' (pasted diff)' : ''));
+      head.className = 'card-title';
+      review.findings.slice(0, 4).forEach(function (f) {
+        noteLine(reviewEl, 'Line ' + f.line + ': ' + (f.hex ? f.hex + ' ' + f.name + '. ' : '') + f.message);
+      });
+    }
+  }
 
   function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   var SHORT = {'zero-width':'ZW','space':'SP','bidi':'BIDI','soft-hyphen':'SHY','tag-char':'TAG','variation-selector':'VS','control':'CTRL'};
@@ -208,7 +269,9 @@
     var text = inEl.value;
     var r = I.scan(text);
     renderHidden(hiddenMsg, r.total ? text : '');
+    renderExtras(text);
     cleanBtn.disabled = !text || (r.total === 0 && !normEl.checked);
+    aiBtn.disabled = !text || (r.total === 0 && I.aiStyle(text).punctuation.total === 0);
 
     if (!text) { summary.innerHTML=''; chips.innerHTML=''; reveal.innerHTML=''; outbox.hidden=true; return; }
 
@@ -246,8 +309,7 @@
   }
 
   function doClean() {
-    var before = inEl.value, r = I.scan(before), t = I.clean(before);
-    if (normEl.checked) t = I.normalizePunctuation(t);
+    var before = inEl.value, r = I.scan(before), t = I.applyClean(before, { punctuation: normEl.checked });
     outEl.value = t;
     outbox.hidden = false;
     var swapped = r.counts.space || 0, deleted = r.total - swapped, parts = [];
@@ -267,9 +329,23 @@
     }).catch(function(){ document.execCommand('copy'); });
   });
 
+  function doAiClean() {
+    var before = inEl.value;
+    var t = I.applyClean(before, { punctuation: true });
+    outEl.value = t;
+    outbox.hidden = false;
+    var r = I.scan(before), swapped = r.counts.space || 0, deleted = r.total - swapped, parts = [];
+    if (deleted) parts.push(deleted + ' removed');
+    if (swapped) parts.push(swapped + ' turned into a normal space');
+    delta.textContent = (parts.length ? parts.join(', ') + '. ' : '') + 'Punctuation normalized.';
+    outEl.style.height = 'auto';
+    outEl.style.height = Math.min(outEl.scrollHeight + 4, 320) + 'px';
+  }
+
   inEl.addEventListener('input', render);
   normEl.addEventListener('change', render);
   cleanBtn.addEventListener('click', doClean);
+  aiBtn.addEventListener('click', doAiClean);
   render();
 })();
 </script>

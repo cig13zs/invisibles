@@ -35,5 +35,24 @@ assert.match(fs.readFileSync('extension/theme.css', 'utf8'), /prefers-reduced-mo
 assert.match(fs.readFileSync('extension/theme.css', 'utf8'), /--font-mono/);
 
 assert.strictEqual(manifest.version, require('./core.js').VERSION);
+assert.ok(manifest.name.length <= 75, 'store name is over 75 characters');
+assert.ok(manifest.description.length <= 132, 'manifest description is over 132 characters');
+assert.ok(!manifest.host_permissions && !manifest.content_scripts && !manifest.optional_permissions,
+  'host access must stay absent');
+assert.strictEqual(manifest.commands._execute_action.suggested_key.default, 'Ctrl+Shift+Period');
+assert.match(popupJs, /normalizePunct/);
+assert.match(popupJs, /hintDismissed/);
+assert.match(popupJs, /cleanOnPaste/);
+assert.match(popupJs, /cleanOnCopy/);
+assert.match(popupJs, /removedTotal/);
+assert.match(popupJs, /I\.applyClean\(/);
+assert.match(popupJs, /I\.homoglyphs\(/);
+assert.match(popupJs, /I\.reviewCode\(/);
+assert.match(popupJs, /I\.aiStyle\(/);
+assert.doesNotMatch(popupJs, /clipboardRead|host_permissions|content_scripts/);
+assert.match(panel, /id="ai-clean"/);
+assert.match(panel, /id="paste"/);
+assert.match(panel, /id="lookalikes"/);
+assert.match(panel, /id="review"/);
 
 console.log('ok, extension security and UI checks passed');

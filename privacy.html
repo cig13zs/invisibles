@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Invisibles privacy policy</title>
-<meta name="description" content="Invisibles does not collect or transmit pasted text. The extension uses sidePanel and storage (two UI preferences only).">
+<meta name="description" content="Invisibles does not collect or transmit pasted text. The extension uses sidePanel and storage for UI preferences and a cleaned-character count only.">
 <meta name="theme-color" content="#161613">
 <link rel="canonical" href="https://cig13zs.github.io/invisibles/privacy.html">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='25' font-size='24'>&#128065;</text></svg>">
@@ -30,15 +30,17 @@
 <div class="wrap">
 
 <h1>Privacy policy</h1>
-<p class="sub">Invisibles browser extension and web app &middot; last updated 17 November 2026</p>
+<p class="sub">Invisibles browser extension and web app &middot; last updated 20 November 2026</p>
 
 <h2>The short version</h2>
 <p>Invisibles does not collect pasted text, does not upload it, and does not use analytics. There is
 no server and no account. The text you paste exists only in the open page or side panel while you are
 using it; it is not saved to disk as content.</p>
-<p>The <strong>extension</strong> may remember two UI choices via
-<code>chrome.storage.sync</code> (whether you dismissed the first-run hint and whether
-&ldquo;normalize smart quotes / em dashes&rdquo; is on). Those flags are not your text. The
+<p>The <strong>extension</strong> may remember a few UI choices via
+<code>chrome.storage.sync</code>: whether you dismissed the first-run hint, whether
+punctuation normalizing is on, and whether clean-on-paste and clean-on-copy are on.
+It may also remember a number in <code>chrome.storage.local</code>: how many hidden
+characters Clean has removed on this browser. Those values are not your text. The
 <strong>web app</strong> does not use any browser storage APIs.</p>
 
 <h2>What data is collected</h2>
@@ -57,16 +59,20 @@ or sells:</p>
 they sit, and builds a cleaned copy. All of that happens in the page you have open, in your own
 browser, using ordinary JavaScript on a variable in memory. The cleaned result stays in the same
 panel until you close it or replace it; it is not uploaded.</p>
-<p>Closing the tab or panel clears pasted content from memory. That is separate from the two
+<p>Closing the tab or panel clears pasted content from memory. That is separate from the
 extension UI preferences below, which Chrome may sync with your profile if you use the extension.</p>
 
 <h2>Storage</h2>
 <p><strong>Pasted text:</strong> not stored. Invisibles does not write your input to
 <code>localStorage</code>, <code>sessionStorage</code>, cookies, IndexedDB, or any server.</p>
 <p><strong>Extension UI only:</strong> the Chrome build uses <code>chrome.storage.sync</code> (with
-<code>chrome.storage.local</code> as a fallback if sync is unavailable) for exactly two booleans:
-whether the first-run hint was dismissed, and whether the optional punctuation-normalize checkbox
-is checked. No strings from your paste are included. The web app at
+<code>chrome.storage.local</code> as a fallback if sync is unavailable) for four booleans:
+whether the first-run hint was dismissed, whether punctuation normalizing is on, and whether
+clean-on-paste and clean-on-copy are on. Existing installs keep the first two keys
+(<code>hintDismissed</code> and <code>normalizePunct</code>); the two new switches default to off.
+<code>chrome.storage.local</code> also stores <code>removedTotal</code>, a count of hidden
+characters cleaned on this browser. No strings from your paste are included. The toolbar badge
+is the current count in the open panel, and it is not saved. The web app at
 <a href="https://cig13zs.github.io/invisibles/">cig13zs.github.io/invisibles</a> does not call
 <code>chrome.storage</code> or <code>localStorage</code>. You can verify this in the public source:
 search for <code>chrome.storage</code> in <code>extension/popup.js</code>.</p>
@@ -75,7 +81,7 @@ search for <code>chrome.storage</code> in <code>extension/popup.js</code>.</p>
 <p>The extension declares <code>sidePanel</code> and <code>storage</code>.</p>
 <ul>
   <li><code>sidePanel</code> &mdash; opens Invisibles beside the current tab when you click its toolbar icon.</li>
-  <li><code>storage</code> &mdash; saves the two UI preferences above via <code>chrome.storage.sync</code>; not your pasted text.</li>
+  <li><code>storage</code> &mdash; saves the UI preferences above and the cleaned-character count; not your pasted text.</li>
 </ul>
 <p>The extension declares no <code>host_permissions</code>, so it cannot read the pages you visit. It
 has no access to your tabs, history, cookies or files.</p>
